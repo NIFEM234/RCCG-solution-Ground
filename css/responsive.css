@@ -110,7 +110,7 @@
        and use variables so the relationship between container height,
        pill height and spacing always satisfies the design tips. */
     .mobile-bottom-nav .mbn-container {
-        --mbn-container-h: 64px; /* overall pill height (feel free to tweak) */
+        --mbn-container-h: 72px; /* overall pill height (feel free to tweak) */
         display:flex;
         align-items:center;
         justify-content:space-between;
