@@ -1,0 +1,4 @@
+/*    /index.html   200
+# Note: Netlify serves 404.html when a resource is not found. Keep the
+# SPA fallback above if you want client-side routing, but be aware the
+# fallback will return index.html with a 200 status for unknown routes.

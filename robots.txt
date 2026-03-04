@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap (production domain)
+Sitemap: https://rccgsolutionground.org/sitemap.xml

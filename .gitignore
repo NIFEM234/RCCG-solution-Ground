@@ -1,0 +1,55 @@
+# Ignore OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# Windows temporary / Office temp files
+~$*
+*.tmp
+
+# IDEs / editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Node / package managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log
+
+# Build output
+dist/
+build/
+out/
+.cache/
+.sass-cache/
+
+# Static site frameworks (if used)
+.next/
+.nuxt/
+public/
+
+# Logs
+logs/
+*.log
+
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# Git LFS attributes file
+.gitattributes
+
+# Design/source files (use Git LFS for large files)
+*.psd
+*.ai
+*.sketch
+
+# Keep image, css, js and site content tracked (do NOT ignore img/ css/ js/)

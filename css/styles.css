@@ -1,0 +1,5889 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap');
+
+/* make interactive controls use pointer cursor universally */
+button,
+input[type="submit"],
+.btn,
+.btn-solid,
+.btn-outline,
+.btn-join,
+.feature-carousel-indicators button {
+    cursor: pointer;
+}
+
+/* Strong override: ensure on touch/active the sweep shows and text becomes black
+   Use touch-active class (added via JS) for reliable behavior on mobile devices. */
+@media (max-width:700px) {
+    .card-btn.touch-active::before { transform: translateX(0) !important; }
+    .card-btn.touch-active span { color: #000 !important; }
+    .card-btn.touch-active { border-color: rgba(0,0,0,0.12) !important; }
+}
+
+/* Mobile: make the hero "Watch online" solid button use a white background for better contrast */
+@media (max-width: 700px) {
+    .hero .btn-solid {
+        background: #ffffff !important;
+        color: var(--brand-blue-dark) !important;
+        border-color: rgba(0,0,0,0.12) !important;
+    }
+
+    .hero .btn-solid::before {
+        background: #ffffff;
+    }
+
+    .hero .btn-solid:hover,
+    .hero .btn-solid:focus {
+        color: var(--brand-blue-dark) !important;
+    }
+}
+
+/* Increase top spacing for the overseers hero on narrow screens so the
+   hero image sits lower below the fixed nav (matches mobile mockup). */
+@media (max-width: 700px) {
+    .overseers-hero {
+        padding-top: 260px; /* increased from global hero padding for mobile */
+    }
+}
+
+:root {
+    --accent: #ebdab0;
+    --brand-blue: #0c2a68; /* default dark-blue (brand) */
+    --brand-blue-dark: #062246;
+    --brand-blue-mid: #0b3a66;
+    --brand-blue-deep: #071726;
+    --dark: #0f1112;
+    --muted: #f6f4ef;
+    --text: #ffffff;
+    --glass: rgba(0, 0, 0, 0.45);
+    --radius: 18px;
+}
+
+/* Header double-bounce animation (desktop only) --------------------------------- */
+@keyframes header-double-bounce {
+    0% { transform: translateY(0); }
+    18% { transform: translateY(-8px); }
+    40% { transform: translateY(0); }
+    62% { transform: translateY(-4px); }
+    85% { transform: translateY(0); }
+ 100% { transform: translateY(0); }
+}
+
+/* Apply the animation to the hero container when the class is toggled. Use
+     transform only so the compositor handles it and it's smooth. The animation
+     is intentionally short and subtle so it's suggestive but not distracting. */
+.hero.header-bounce-animate {
+    /* Bounce animation disabled globally per request */
+    animation: none !important;
+    will-change: auto;
+}
+
+/* Only enable visual hint on larger viewports (desktop). This is a safety
+     fallback in case JS toggles the class on smaller screens. */
+@media (max-width: 900px) {
+    .hero.header-bounce-animate { animation: none !important; will-change: auto; }
+}
+
+/* small downward arrow that appears subtly during the bounce animation */
+@keyframes header-arrow-bob {
+    0%   { opacity: 0; transform: translateX(-50%) translateY(0); }
+    18%  { opacity: 0.95; transform: translateX(-50%) translateY(-6px); }
+    40%  { opacity: 0.85; transform: translateX(-50%) translateY(0); }
+    62%  { opacity: 0.7; transform: translateX(-50%) translateY(-3px); }
+ 100% { opacity: 0; transform: translateX(-50%) translateY(0); }
+}
+
+.hero.header-bounce-animate::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 22px; /* sit just above the bottom padding */
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 9px solid rgba(255,255,255,0.9);
+    opacity: 0;
+    pointer-events: none;
+    /* arrow animation disabled */
+    display: none !important;
+}
+
+@media (max-width: 900px) {
+    .hero.header-bounce-animate::after { display: none !important; }
+}
+
+
+/* Disable transitions/animations during initial page paint to avoid
+   an unwanted 'foggy' fade when navigating between pages. Pages should
+   add the `no-transitions` class to <html> until JS removes it. */
+.no-transitions *, .no-transitions *::before, .no-transitions *::after {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Performance hints: prefer compositor-thread properties so animations
+   and JS-driven transforms run smoothly in real time. Keep this small
+   and targeted to avoid excessive GPU memory usage. */
+.interactive,
+.hero .slide,
+.hero-cards .card,
+.card,
+.video-wrap img,
+.slider .slide,
+.value-card .card-inner,
+.history-logo-inner,
+.site-header,
+.feature {
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+* {
+    box-sizing: border-box
+}
+
+/* Prevent horizontal page scroll from full-bleed sections (marquee) */
+html, body { overflow-x: hidden; }
+
+body {
+    margin: 0;
+    font-family: 'Montserrat', Inter, system-ui, Arial, sans-serif;
+    color: #fff;
+    background: #fff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 400;
+}
+
+/* Apply a bolder Montserrat weight to all headings (matches the screenshot) */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 800;
+    line-height: 1.15;
+}
+
+/* Prominent UI text to emphasise (site‑wide) */
+.section-title,
+.section h2,
+.visit-section .section-title,
+.footer-col h4,
+.eyebrow,
+.video-info .eyebrow,
+.eyebrow-badge,
+.video-thumb strong,
+strong {
+    font-weight: 700;
+    letter-spacing: 0.1px;
+}
+
+/* Keep logo and hero heavier */
+.logo span { font-weight: 900; }
+.hero-title { font-weight: 900; }
+
+.container {
+    /* widened layout to give hero and cards more horizontal space */
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    /* Fully transparent header (clear glass look) */
+    background: transparent;
+    /* remove blur/backdrop so it's not frosted */
+    backdrop-filter: none;
+    /* remove divider to keep header fully transparent */
+    border-bottom: none;
+}
+
+/* Hide-on-scroll: animate header off the top when scrolling down */
+.site-header {
+    transition: transform 280ms ease, top 280ms ease;
+    will-change: transform;
+}
+
+
+/* Header row combining logo + eyebrow */
+.visit-header { display: flex; align-items: center; gap: 14px; }
+.visit-logo { width: 72px; height: auto; display: block; background: transparent; border-radius: 0; box-shadow: none; }
+
+.site-header.header-hidden {
+    transform: translateY(-110%);
+}
+
+.nav-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 0
+}
+
+/* Entrance animation: header children slide down with slight stagger and blur-to-clear */
+.site-header .logo,
+.site-header .main-nav > ul > li,
+.site-header .btn-give {
+    transform: translateY(-8px);
+    opacity: 0;
+    /* remove blur completely for the smoothest appearance */
+    filter: blur(0);
+    /* fast, smooth entrance */
+    transition: transform 480ms cubic-bezier(.08,.82,.165,1), opacity 400ms ease, filter 480ms ease;
+    will-change: transform, opacity, filter;
+    pointer-events: none; /* re-enabled when visible */
+}
+
+.site-header.nav-entered {
+    /* Keep header fully transparent on entrance (no blur/backdrop) */
+    background: transparent;
+    backdrop-filter: none;
+}
+
+.site-header.nav-entered .logo,
+.site-header.nav-entered .main-nav > ul > li,
+.site-header.nav-entered .btn-give {
+    transform: translateY(0);
+    opacity: 1;
+    filter: blur(0);
+    pointer-events: auto;
+}
+
+/* Default stagger (fallback if JS isn't available) */
+.main-nav > ul > li:nth-child(1) { transition-delay: 120ms; }
+.main-nav > ul > li:nth-child(2) { transition-delay: 190ms; }
+.main-nav > ul > li:nth-child(3) { transition-delay: 260ms; }
+.main-nav > ul > li:nth-child(4) { transition-delay: 330ms; }
+.main-nav > ul > li:nth-child(5) { transition-delay: 400ms; }
+.main-nav > ul > li:nth-child(6) { transition-delay: 470ms; }
+.site-header .logo { transition-delay: 80ms; }
+.site-header .btn-give { transition-delay: 520ms; }
+
+@media (max-width: 700px) {
+    .site-header .logo,
+    .site-header .main-nav > ul > li,
+    .site-header .btn-give {
+        transform: translateY(-6px);
+        /* no blur on mobile either */
+        filter: blur(0);
+        transition: transform 360ms cubic-bezier(.08,.82,.165,1), opacity 320ms ease, filter 360ms ease;
+    }
+    .main-nav > ul { gap: 14px; }
+}
+
+/* Hide mobile toggle by default (only shown via mobile media query) */
+.nav-toggle { display: none }
+
+.logo {
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #fff;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo img {
+    height: 44px;
+    width: auto;
+    display: block
+}
+
+.logo span {
+    font-weight: 900
+}
+
+.main-nav>ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 28px;
+    align-items: center
+}
+
+.main-nav a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700; /* emphasized for better hierarchy */
+    display: inline-block;
+    padding: 6px 8px;
+    letter-spacing: 0.2px;
+} 
+
+/* Center-expanding underline for top-level nav links (appears on hover or when dropdown is open) */
+.main-nav>ul>li>a {
+    position: relative;
+}
+
+.main-nav>ul>li>a::after {
+    content: "";
+    position: absolute;
+    /* align with the link's padded edges so the line reaches the text */
+    left: 8px;
+    right: 8px;
+    bottom: 2px;
+    /* closer under the text */
+    height: 2px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 220ms ease;
+    border-radius: 2px;
+}
+
+.main-nav>ul>li>a:hover::after,
+.main-nav>ul>li>a:focus::after,
+.has-dropdown:hover>a::after,
+.has-dropdown:focus-within>a::after {
+    transform: scaleX(1);
+}
+
+.has-dropdown {
+    position: relative;
+}
+
+.dropdown {
+    position: absolute;
+    /* place directly under the parent link */
+    top: 100%;
+    left: 0;
+    /* translucent dark background with blur to match the chat window */
+    background: rgba(6, 10, 18, 0.62);
+    color: #fff;
+    padding: 8px 8px;
+    border-radius: 12px;
+    display: none;
+    min-width: 180px;
+    margin-top: 20px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.45);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.04);
+    z-index: 220;
+}
+
+/* Keep the menu visible when hovering the parent list item, focusing it, or
+   hovering the dropdown itself so links inside can be clicked. */
+.has-dropdown:hover .dropdown,
+.has-dropdown:focus-within .dropdown,
+.has-dropdown .dropdown:hover {
+    display: block;
+    z-index: 120;
+}
+
+.dropdown li {
+    padding: 6px 0;
+    list-style: none;
+    /* remove default bullet/marker */
+}
+
+/* Desktop-only dropdown "swirl" animation: smooth, sequential drop-in
+   The first item drops first, middle items follow, and the last drops last.
+   Uses small staggered delays and an ease-out landing for a natural feel. */
+@media (min-width: 900px) {
+    .main-nav .dropdown {
+        perspective: 600px; /* subtle 3D perspective for rotateX effect */
+        transform-style: preserve-3d;
+    }
+
+    .main-nav .dropdown li {
+        opacity: 0;
+        transform: translateY(-12px) rotateX(6deg);
+        transform-origin: top center;
+        will-change: transform, opacity;
+        /* ensure mouse interactions are disabled until visible */
+        pointer-events: none;
+    }
+
+    /* Keyframes for a gentle "swirl" drop with a slight overshoot and ease-out landing */
+    @keyframes dropdown-swirl {
+        0% {
+            opacity: 0;
+            transform: translateY(-14px) rotateX(8deg);
+        }
+        60% {
+            opacity: 1;
+            transform: translateY(6px) rotateX(-2deg);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0) rotateX(0deg);
+        }
+    }
+
+    /* When the dropdown is opened (hover or focus-within), animate list items with staggered delays */
+    .has-dropdown:hover .dropdown li,
+    .has-dropdown:focus-within .dropdown li,
+    .has-dropdown .dropdown:hover li {
+        animation-name: dropdown-swirl;
+        animation-duration: 420ms;
+        animation-timing-function: cubic-bezier(.08, .82, .165, 1);
+        animation-fill-mode: both; /* keep end state */
+        pointer-events: auto; /* enable interactions when visible */
+    }
+
+    /* Stagger delays to produce the swirl sequence. First item appears slightly before others. */
+    .main-nav .dropdown li:nth-child(1) { animation-delay: 0ms; }
+    .main-nav .dropdown li:nth-child(2) { animation-delay: 70ms; }
+    .main-nav .dropdown li:nth-child(3) { animation-delay: 140ms; }
+    .main-nav .dropdown li:nth-child(4) { animation-delay: 210ms; }
+    .main-nav .dropdown li:nth-child(5) { animation-delay: 280ms; }
+    .main-nav .dropdown li:nth-child(6) { animation-delay: 350ms; }
+
+    /* Reduce the overshoot and delay for very large dropdowns so the motion stays snappy */
+    .main-nav .dropdown li { animation-duration: 380ms; }
+}
+
+/* Ensure dropdown lists have no left margin or padding and links span the full row */
+.main-nav .dropdown {
+    margin: 0;
+    padding: 8px 6px;
+}
+
+.main-nav .dropdown a {
+    display: block;
+    padding: 6px 10px;
+    color: #fff;
+}
+
+/* Desktop-only: nudge hero overlay down slightly for better spacing */
+@media (min-width: 900px) {
+    .hero .hero-overlay {
+        padding-top: 48px; /* small downward offset on desktop */
+    }
+}
+
+/* Hide dropdowns on small/touch screens to avoid accidental opening; implement explicit mobile menu later if needed */
+@media (max-width:900px) {
+    .dropdown {
+        display: none !important;
+        /* prevent browser from adding its own marker */
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    /* when the mobile menu is shown via script, re‑enable bullets for dropdown links */
+    .main-nav .dropdown li { list-style: none; padding-left: 4px; }
+    .main-nav .dropdown li a::before {
+        content: "\2022"; /* bullet character */
+        display: inline-block;
+        margin-right: 6px;
+        color: inherit;
+        font-weight: 700;
+    }
+}
+
+/* Mobile: tighten card/button layout so CTAs are readable and well-sized */
+@media (max-width: 700px) {
+    .hero-cards {
+        flex-direction: column;
+        gap: 18px;
+        padding: 24px 12px;
+        align-items: stretch;
+    }
+
+    .hero-cards .card {
+        width: 100%;
+        max-width: 720px;
+        min-height: 260px;
+        border-radius: 14px;
+    }
+
+    .hero-cards .card-img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover !important;
+        background-position: center !important;
+    }
+
+    .hero-cards .card-body {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 18px;
+        background: linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.42) 100%);
+    }
+
+    /* Make card CTA a compact pill and centre it on small screens */
+    .card-btn {
+        display: inline-block;
+        max-width: 260px;
+        width: auto;
+        padding: 8px 16px;
+        margin: 10px auto 0; /* center horizontally */
+        border-width: 2px;
+        border-color: rgba(255,255,255,0.92);
+        background: transparent;
+        color: #fff !important;
+        text-align: center;
+        font-size: 15px;
+    }
+
+    /* Ensure the sweep doesn't hide the text on touch devices where :hover isn't triggered */
+    .card-btn::before { transform: translateX(-100%); }
+    .card-btn span { color: #fff !important; text-shadow: 0 6px 18px rgba(0,0,0,0.6); }
+
+    /* Keep live (red) button compact while preserving its color */
+    .card-btn.live-btn, .live-btn.card-btn {
+        padding: 8px 14px;
+        max-width: 220px;
+    }
+    
+    /* Ensure the sweep animation on mobile shows white background while text turns black */
+    .card-btn:active span,
+    .card-btn:focus span,
+    .card-btn.active span {
+        color: #000 !important;
+    }
+
+    .card-btn:active,
+    .card-btn:focus,
+    .card-btn.active {
+        border-color: rgba(0,0,0,0.12) !important;
+    }
+
+    /* Center text and headings inside the card body on small screens */
+    .hero-cards .card-body { text-align: center; display: flex; flex-direction: column; align-items: center; }
+    .hero-cards .card-body h3, .hero-cards .card-body p { text-align: center; }
+}
+
+.btn-give {
+    background: var(--brand-blue);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 14px; /* increased roundedness */
+    text-decoration: none;
+    font-weight: 700
+}
+
+.hero {
+    /* allow hero to grow when additional content is placed inside */
+    min-height: 100vh;
+    height: auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    /* increased top padding so fixed header won't overlap the hero image */
+    padding-top: 200px;
+    padding-bottom: 48px;
+}
+
+/* Page-specific hero adjustments: center overlay content and nudge down slightly
+   so page-level heroes (like `ministries.html`) appear vertically centered
+   but a bit lower for the visual shown in the screenshot. */
+.page-hero {
+    /* keep overall spacing for fixed header but center main content vertically */
+    padding-top: 120px;
+    justify-content: center; /* centers column main-axis (vertical) */
+}
+
+.page-hero .hero-overlay {
+    position: relative;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    /* nudge the overlay content down slightly from exact center */
+    transform: translateY(28px);
+    z-index: 4;
+}
+
+.page-hero .hero-overlay .container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Reduce size for the replicated "What We Believe" hero */
+#what-we-believe.hero {
+    /* let the section grow with its content; desktop should show full
+       bible background behind the text/buttons */
+    height: auto;
+    min-height: 320px; /* slightly shorter on larger screens */
+    padding-top: 40px;
+    padding-bottom: 40px;
+    align-items: center; /* vertically center content when height allows */
+    margin-top: 20px; /* reduce top gap so hero aligns closer to design line */
+}
+
+@media (max-width: 900px) {
+    #what-we-believe.hero { min-height: 280px }
+}
+
+@media (max-width: 560px) {
+    #what-we-believe.hero { height: 260px; min-height: 220px; padding-top: 28px; padding-bottom: 28px }
+    #what-we-believe .hero-title { font-size: 28px }
+}
+
+/* Mobile: ensure the "What We Believe" hero places text over the bible image
+   and centers it. This makes the heading and buttons sit on top of the
+   background rather than below it on small phones. */
+@media (max-width: 700px) {
+    /* keep background solid white on phones as well */
+    #what-we-believe { background-color:#ffffff !important; }
+
+    #what-we-believe.hero {
+        position: relative;
+        padding-top: 0; /* allow overlay to control spacing */
+        padding-bottom: 0;
+        min-height: 280px;
+    }
+
+    #what-we-believe .hero-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 18px 14px;
+        z-index: 4; /* above the semi-transparent overlay */
+    }
+
+    #what-we-believe .hero-overlay .container {
+        display: flex;
+        flex-direction: column;
+        gap: 6px; /* reduced gap to tighten spacing between title and buttons */
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Ensure text is light so it contrasts with the bible image */
+    #what-we-believe .hero-title,
+    #what-we-believe .kicker,
+    #what-we-believe .belief-msg,
+    #what-we-believe .belief-buttons button {
+        color: #fff !important;
+    }
+
+    /* Slightly reduce title size on narrow phones */
+    @media (max-width: 420px) {
+        #what-we-believe .hero-title { font-size: 24px }
+    }
+
+    /* Mobile: force white background and stack text above the gif */
+    #what-we-believe { background-color: #ffffff !important; background-image: none !important; }
+    #what-we-believe .hero-overlay { background-color: #ffffff !important; position: relative; padding: 20px; }
+    #what-we-believe .hero-overlay .container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        width: 100%;
+    }
+
+    /* Ensure left column (text) appears first and stretches full width */
+    #what-we-believe .belief-left { order: 1; width: 100%; }
+    #what-we-believe .belief-left .hero-title { font-size: 32px; }
+
+    /* Gif appears after the text and is centered within its block */
+    #what-we-believe .belief-right { order: 2; width: 100%; text-align: center; margin-top: 8px; }
+    /* Make gif larger on mobile while keeping some horizontal breathing room */
+    #what-we-believe .belief-right img { max-width: 360px; width: 92%; height: auto; border-radius: 12px; margin: 0 auto; display: block; }
+
+    /* Buttons align to the left edge on mobile */
+    #what-we-believe .belief-buttons { justify-content: flex-start; }
+}
+
+/* Ensure the kicker stays on one straight line on narrow screens */
+@media (max-width: 420px) {
+    #what-we-believe .kicker {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+        font-size: 0.9rem; /* slightly smaller so it fits */
+        letter-spacing: 0.6px;
+    }
+}
+
+/* Hide the floating back-to-top button on small screens */
+@media (max-width: 700px) {
+    #back-to-top { display: none !important; }
+}
+
+/* Tighten vertical spacing specifically between the hero title and buttons */
+@media (max-width: 700px) {
+    #what-we-believe .hero-title { margin-bottom: 6px; }
+    #what-we-believe .belief-buttons { margin-top: 4px; }
+}
+
+/* When the footer immediately follows this hero, remove the footer's top gap
+   and rely on the hero's top margin so the white space appears above. */
+#what-we-believe + .site-footer { margin-top: 0 }
+
+/* ensure all text and controls in the belief section use dark blue */
+#what-we-believe {
+    color: #0b2f6b;
+}
+#what-we-believe .kicker,
+#what-we-believe .hero-title,
+#what-we-believe .question-mark,
+#what-we-believe .belief-msg {
+    color: #0b2f6b !important;
+}
+
+#what-we-believe .btn {
+    color: #0b2f6b !important;
+    border-color: #0b2f6b !important;
+}
+#what-we-believe .btn-solid {
+    background-color: #0b2f6b !important;
+    color: #fff !important;
+}
+
+/* remove special styling for yes button since both should match */
+#what-we-believe .btn-outline {
+    /* make outline buttons appear as white pills with a dark-blue border/text */
+    background: #ffffff !important;
+    color: #0b2f6b !important;
+    border: 3px solid #0b2f6b !important;
+    box-shadow: none !important;
+    padding: 10px 16px !important;
+    border-radius: 999px !important;
+}
+
+/* ensure the sweep overlay doesn't hide the white background on hover */
+#what-we-believe .btn-outline::before { background: #ffffff !important; }
+
+/* green border on hover/focus so yes/no highlight looks distinct */
+#what-we-believe .btn-outline:hover,
+#what-we-believe .btn-outline:focus {
+    border-color: #28a745 !important;
+    color: #28a745 !important; /* keep text in same green when hovering */
+}
+
+#what-we-believe .btn-outline span { color: #0b2f6b !important; }
+
+#what-we-believe .hero-title,
+#what-we-believe .kicker,
+#what-we-believe .question-mark {
+    text-shadow: none !important;
+}
+
+.hero-slideshow {
+    position: absolute;
+    inset: 0;
+    overflow: hidden
+}
+
+/* Desktop: center the What We Believe overlay vertically over the
+   bible background so the heading/buttons sit in the middle of the image. */
+@media (min-width: 701px) {
+    /* ensure the section itself stays a solid white block across the viewport */
+    #what-we-believe {
+        background-color: #ffffff !important;
+        background-image: none !important;
+    }
+
+    #what-we-believe.hero {
+        /* allow the background to show while keeping enough height */
+        min-height: 260px;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    #what-we-believe .hero-overlay {
+        background-color: #ffffff;
+    }
+
+    #what-we-believe .hero-overlay {
+        position: relative;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 32px 20px; /* small breathing room */
+    }
+
+    #what-we-believe .hero-overlay .container {
+        /* remove the centering constraints so text/gif can sit at opposite edges */
+        max-width: none;
+        display: flex;
+        flex-direction: row;
+        gap: 24px;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    /* reduce large top padding used elsewhere so title truly centers */
+    #what-we-believe .hero-overlay .hero-title { margin-top: 0; margin-bottom: 6px; }
+
+    /* Slightly increase GIF size on desktop for better visibility */
+    #what-we-believe .belief-right img {
+        max-width: 520px;
+        width: auto;
+    }
+}
+
+/* highlight used for links or emphasis within white sections */
+.highlight-blue {
+    color: var(--brand-blue);
+    font-weight: 700;
+}
+
+.slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1s ease;
+    /* apply a subtle blur and dimming so overlay text is clearer */
+}
+
+.slide.active {
+    opacity: 1
+}
+
+.hero-overlay {
+    position: relative;
+    z-index: 3;
+    /* added extra space above text to shift it down */
+    padding-top: 160px;
+    text-align: center;
+    width: 100%
+}
+
+/* Single fade-in + subtle lift animation for hero overlay texts (runs once on load)
+   Match nav timing: transform 480ms cubic-bezier(.08,.82,.165,1), default delay 80ms */
+@keyframes hero-fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero .hero-overlay .hero-fade {
+    opacity: 0;
+    transform: translateY(8px);
+    will-change: transform, opacity;
+}
+
+.hero .hero-overlay .hero-fade.visible {
+    /* slightly slower for a smoother arrival */
+    animation: hero-fade-in 680ms cubic-bezier(.08,.82,.165,1) var(--hero-fade-delay, 0.8s) forwards;
+}
+
+/* subtle dark overlay on hero backgrounds to improve text contrast */
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    /* lighter tint so hero images remain more visible */
+    background: linear-gradient(rgba(11, 58, 102, 0.219), rgba(11,58,102,0.12));
+    z-index: 2; /* sits above slides but below hero content */
+    pointer-events: none;
+}
+/* slightly lighter semi-transparent overlay specifically for the youth header */
+.youth-hero::before {
+    background: linear-gradient(rgba(6,34,70,0.52), rgba(6, 34, 70, 0.226));
+}
+
+    /* pushed further down only on youth page to move text a bit lower */
+    .youth-hero .hero-overlay {
+        /* override default spacing; increased to match new hero padding */
+        padding-top: 340px;
+    }
+
+    /* Move index hero text further down only on larger screens so it has
+       more breathing room under the fixed header. Keep mobiles unchanged. */
+    @media (min-width: 900px) {
+        #hero .hero-overlay {
+            padding-top: 480px; /* increased to push text lower on desktop */
+        }
+    }
+/* center-mounted bouncy scroll control inside hero (overrides the fixed-site variant) */
+.hero .hero-down-btn {
+    position: fixed;
+    right: 20px;
+    bottom: 22px;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px; /* match back-to-top shape */
+    border: none;
+    background: var(--brand-blue);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 56; /* sit slightly below back-to-top so the latter can appear above */
+    box-shadow: none;
+    cursor: pointer;
+    animation: hero-bounce 1.6s infinite;
+}
+
+.hero .hero-down-btn svg { width:22px; height:22px; display:block; fill: #fff }
+.hero .hero-down-btn:hover { transform: translateY(-4px) scale(1.04); }
+
+/* Smooth hide state when back-to-top appears so buttons transition nicely */
+.hero .hero-down-btn {
+    transition: opacity 260ms ease, transform 260ms ease;
+}
+.hero .hero-down-btn.hidden {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+    pointer-events: none;
+}
+
+@media (max-width:700px) {
+    .hero .hero-down-btn { width:44px; height:44px; right:12px; bottom:16px }
+    .hero .hero-down-btn svg { width:18px; height:18px }
+}
+
+/* Mobile fixes: reduce hero vertical footprint so below content becomes visible */
+@media (max-width:700px) {
+    .hero {
+        padding-top: 72px; /* smaller top padding for fixed header on phones */
+        padding-bottom: 28px;
+        min-height: auto; /* allow content to flow immediately after hero */
+    }
+
+    .page-hero {
+        padding-top: 40px; /* nudge overlay less on small screens */
+    }
+
+    .page-hero .hero-overlay {
+        transform: none;
+        padding-top: 8px;
+    }
+
+    .container {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}
+
+/* Mobile: ensure belief button text becomes black when the white sweep
+    animation is visible (on active/pressed or persistent .active state). */
+@media (max-width: 700px) {
+    .belief-buttons .btn-solid:active,
+    .belief-buttons .btn-solid:focus,
+    .belief-buttons .btn-solid.active {
+        color: #000 !important;
+    }
+    .belief-buttons .btn-solid:active span,
+    .belief-buttons .btn-solid:focus span,
+    .belief-buttons .btn-solid.active span {
+        color: #000 !important;
+    }
+
+    .belief-buttons .btn-outline:active,
+    .belief-buttons .btn-outline:focus,
+    .belief-buttons .btn-outline.active {
+        color: #000 !important;
+        border-color: rgba(0,0,0,0.12) !important;
+    }
+    .belief-buttons .btn-outline:active span,
+    .belief-buttons .btn-outline:focus span,
+    .belief-buttons .btn-outline.active span {
+        color: #000 !important;
+    }
+}
+
+/* Mobile-only: push the index hero overlay downward so the hero text has
+   additional breathing room under the fixed header on phones. Adjust only
+   the #hero section (index) so other page heroes are unaffected. */
+@media (max-width:700px) {
+    #hero .hero-overlay {
+        padding-top: 260px; /* increased top padding for mobile index hero */
+    }
+}
+
+/* hide scroll-down button entirely on narrower phones */
+@media (max-width:600px) {
+    .hero .hero-down-btn { display: none !important; }
+}
+
+/* Contact page: dark navy background with white text and high-contrast form controls */
+#contact {
+    background: var(--brand-blue-dark);
+    color: #fff;
+}
+
+#contact a { color: #cfe8ff; }
+
+#contact .feature { align-items: center; gap: 28px; }
+
+#contact .feature-content h2,
+#contact .feature-content p,
+#contact .feature-content .muted-italic,
+#contact .feature-content label,
+#contact .feature-content .eyebrow {
+    color: #fff;
+}
+
+#contact form input,
+#contact form textarea {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    color: #fff !important;
+}
+
+#contact form input::placeholder,
+#contact form textarea::placeholder { color: rgba(255,255,255,0.72) !important; }
+
+#contact .btn-solid {
+    background: #000;
+    color: #fff;
+    border: none;
+    transition: background-color 180ms ease, color 180ms ease, filter 180ms ease;
+}
+
+/* When the button background changes (hover/focus/active), switch text to black for contrast */
+#contact .btn-solid:hover,
+#contact .btn-solid:focus,
+#contact .btn-solid:active {
+    /* when interacting, switch to a light background and make the text black for contrast */
+    background: #ffffff;
+    color: #000 !important;
+    filter: none;
+    box-shadow: 0 6px 18px rgba(2,10,20,0.12);
+}
+
+#contact .feature-img img { border-radius: 12px; box-shadow: 0 8px 28px rgba(2,10,20,0.5); }
+
+/* Page-level background for contact page to ensure the area under the footer is dark */
+body.contact-page {
+    background: #072449; /* match bg-blue-standard so no white stripe appears */
+    color: var(--brand-blue-dark);
+}
+
+/* Keep the footer matched to the page on the contact page */
+body.contact-page .site-footer {
+    background: #0b0b0b;
+}
+
+/* Mobile: stack contact form and image, reduce textarea height and font sizes */
+@media (max-width: 700px) {
+    #contact .feature {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        align-items: stretch;
+    }
+
+    #contact .feature-content,
+    #contact .feature-img {
+        width: 100%;
+    }
+
+    /* Make inputs full-width and stacked */
+    #contact form div[style*="display:flex"] {
+        display: block !important;
+    }
+
+    #contact form input[type="text"],
+    #contact form input[type="email"],
+    #contact form input[type="tel"] {
+        width: 100% !important;
+        display: block !important;
+        margin-bottom: 10px;
+        padding: 10px !important;
+        font-size: 14px;
+    }
+
+    /* on mobile, make the little questionnaire text align left instead of center */
+    #contact .feature-content .survey { text-align: left; }
+    #contact .feature-content .survey label { text-align: left; }
+    }
+
+    /* Reduce textarea height for mobile and smaller text */
+    #contact form textarea {
+        height: 180px !important;
+        min-height: 140px !important;
+        padding: 10px !important;
+        font-size: 14px !important;
+    }
+
+    /* Center the button and reduce its size on mobile */
+    #contact .btn-solid {
+        display: inline-block;
+        margin: 12px auto 0 auto;
+        padding: 8px 18px;
+        font-size: 14px;
+    }
+
+    /* Ensure contact image scales nicely */
+    #contact .feature-img img {
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+    }
+
+    /* Slightly reduce heading sizes on small screens */
+    #contact .feature-content h2 { font-size: 28px; }
+    #contact .feature-content p { font-size: 14px; }
+
+
+
+/* Center the typing headline and subtitle for page heroes only (scoped) */
+.page-hero .hero-overlay {
+    /* let the overlay fill the hero area and remove the top offset */
+    height: 100%;
+    padding-top: 0;
+}
+
+/* Watch page: move hero text to the middle-right side for a side-panel layout */
+.watch-hero .hero-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    text-align: right;
+    padding-right: 80px;
+}
+
+/* Overseers slider: simple two-slide layout and controls */
+.overseer-profile { position: relative; }
+.overseer-slides { position: relative; }
+.overseer-slide { display: none; }
+.overseer-slide.active { display: block; }
+.overseer-slide .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+.overseer-slide .profile-img img { width: 100%; border-radius: 12px; display:block }
+.overseer-prev, .overseer-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 60;
+}
+.overseer-prev { left: 8px }
+/* place the next button inside the profile container edge to avoid covering text */
+.overseer-next { right: -50px }
+/* arrows should be white for better contrast against dark background */
+.overseer-prev svg path, .overseer-next svg path { stroke: #fff; }
+
+.overseer-prev, .overseer-next { background: rgba(255,255,255,0.03); border-radius: 10px; padding: 10px; }
+.overseer-prev:hover, .overseer-next:hover { background: rgba(11,58,102,0.16); }
+
+@media (max-width:900px) {
+    .overseer-slide .profile-grid { grid-template-columns: 1fr; text-align: center }
+    /* show slider controls on mobile and make them easy to tap */
+    .overseer-prev, .overseer-next {
+        display: inline-flex;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 44px;
+        height: 44px;
+        align-items: center;
+        justify-content: center;
+        padding: 8px;
+        background: rgba(0,0,0,0.18);
+        border-radius: 10px;
+        z-index: 80;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+    }
+    .overseer-prev { left: 12px }
+    .overseer-next { right: 12px }
+}
+
+@media (max-width:900px) {
+    .watch-hero .hero-overlay {
+        align-items: center;
+        text-align: center;
+        padding-right: 24px;
+        padding-left: 24px;
+    }
+}
+
+.page-hero .hero-overlay .container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.eyebrow {
+    letter-spacing: 3px;
+    color: #fff;
+    opacity: 0.95;
+    font-size: 13px;
+    font-weight: 700;
+} 
+
+.hero-title {
+    font-size: 48px; /* slightly reduced for better balance */
+    /* larger, bolder hero quote */
+    margin: 12px 0;
+    color: #fff;
+    text-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+    line-height: 1.03;
+    font-weight: 900;
+    /* allow a wider headline block on large screens */
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Keep heading vertical space stable even when the typed text empties
+   (prevents buttons / CTAs below from shifting when the script deletes text) */
+.page-hero .hero-title {
+    min-height: 3.25rem; /* ~52px; keeps single-line height consistent */
+}
+
+@media (max-width: 560px) {
+    .page-hero .hero-title { min-height: 2.2rem; }
+}
+
+/* Slightly reduce the main index hero headline so it appears a bit smaller */
+#hero .hero-title {
+    font-size: 40px;
+}
+
+/* Typing animation styles for hero */
+.typed {
+    display: inline-block;
+    color: var(--muted);
+    font-weight: 800;
+    margin-left: 8px;
+}
+
+.typed::after {
+    content: "";
+    display: inline-block;
+    width: 12px;
+    height: 28px;
+    vertical-align: -6px;
+    margin-left: 6px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.75));
+    opacity: 0.95;
+    animation: blink 1s steps(2, start) infinite;
+}
+
+@keyframes blink {
+    to { opacity: 0 }
+}
+
+/* Scroll-down button in hero (bouncing) */
+.hero-down-btn {
+    /* fixed to the viewport's bottom-right and slightly smaller */
+    position: fixed;
+    right: 28px;
+    bottom: 28px;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    /* blue circle background while keeping the arrow white */
+    background: var(--brand-blue);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(30,115,255,0.14);
+    cursor: pointer;
+    z-index: 64;
+    box-shadow: 0 8px 20px rgba(2,10,20,0.45);
+    animation: hero-bounce 1.6s infinite;
+}
+
+.hero-down-btn svg { display:block; width:56%; height:56% }
+/* ensure the arrow inside remains white on all states */
+.hero-down-btn svg path,
+.hero-down-btn svg polygon,
+.hero-down-btn svg circle {
+    fill: #fff !important;
+}
+
+.hero-down-btn:hover,
+.hero-down-btn:focus {
+    filter: brightness(0.96);
+}
+
+.hero-down-btn:focus {
+    outline: 2px solid rgba(30,115,255,0.16);
+    outline-offset: 2px;
+}
+
+@keyframes hero-bounce {
+    0% { transform: translateY(0) }
+    50% { transform: translateY(-10px) }
+    100% { transform: translateY(0) }
+}
+
+/* Back to top button (hidden until scrolled) */
+#back-to-top {
+    position: fixed;
+    right: 28px;
+    bottom: 28px;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: var(--brand-blue);
+    color: #fff;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 12px 28px rgba(2,8,20,0.4);
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+    transition: opacity 260ms ease, transform 260ms ease;
+    z-index: 60;
+    cursor: pointer;
+}
+
+#back-to-top.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+#back-to-top:focus { outline: 2px solid rgba(30,115,255,0.18) }
+
+@media (max-width:700px) {
+    .hero-down-btn { bottom: 18px; right: 12px; width:40px; height:40px }
+    .hero-down-btn svg { width:60%; height:60% }
+    #back-to-top { right: 12px; bottom: 12px }
+}
+
+/* desktop-only helper: hide on small screens */
+.desktop-only { display: inline-flex; }
+@media (max-width:700px) {
+    .desktop-only { display: none !important; }
+}
+
+/* Hidden state for the hero-down button when page is scrolled */
+.hero-down-btn.hidden {
+    opacity: 0;
+    transform: scale(0.8) translateY(6px);
+    pointer-events: none;
+    transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.hero-cta {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 18px
+}
+
+.btn {
+    padding: 12px 18px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 700
+}
+
+/* ensure buttons are inline-block so their pseudo-elements are clipped correctly */
+.btn {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.btn-outline {
+    border: 3px solid rgba(255, 255, 255, .8); /* thicker outline for stronger pill */
+    background: transparent;
+    color: #fff
+}
+
+/* Sweep-to-white hover effect: white background moves left→right and text turns black */
+.btn-outline {
+    position: relative;
+    overflow: hidden;
+    transition: color 450ms ease;
+}
+
+.btn-outline::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    transform: translateX(-100%);
+    /* slower, smoother slide: gentler cubic-bezier and longer duration */
+    transition: transform 1.6s cubic-bezier(.22, 0.0, .20, 1);
+    /* match the button's rounded corners so the sweep stays inside */
+    border-radius: inherit;
+    /* clip precisely to the button shape to avoid any overflow artifacts */
+    -webkit-clip-path: inset(0 round inherit);
+    clip-path: inset(0 round inherit);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.btn-outline span {
+    /* ensure the button text sits above the animated white background */
+    position: relative;
+    z-index: 2;
+    transition: color 450ms ease;
+}
+
+.btn-outline.active span {
+    color: var(--brand-blue);
+}
+
+.btn-outline:hover::before,
+.btn-outline:focus::before {
+    transform: translateX(0);
+}
+
+.btn-outline:hover,
+.btn-outline:focus {
+    color: var(--brand-blue);
+}
+
+/* persistent active state (e.g., toggled via JS) keeps the white sweep visible and text black */
+.btn-outline.active::before {
+    transform: translateX(0);
+}
+
+.btn-outline.active {
+    color: var(--brand-blue);
+}
+
+/* When outline buttons appear on light section backgrounds, show black text
+   initially and switch to brand blue on hover/active. Keeps the same white
+   sweep animation behind the text. */
+.section.light .btn-outline {
+    color: #000;
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+.section.light .btn-outline span {
+    /* ensure the visible text starts black and transitions smoothly */
+    color: #000 !important;
+    transition: color 240ms ease;
+}
+
+.section.light .btn-outline:hover span,
+.section.light .btn-outline:focus span,
+.section.light .btn-outline.active span {
+    color: var(--brand-blue) !important;
+}
+
+.section.light .btn-outline:hover,
+.section.light .btn-outline:focus,
+.section.light .btn-outline.active {
+    color: var(--brand-blue);
+    /* subtle blue-tinted border when hovering on light backgrounds */
+    border-color: rgba(30, 115, 255, 0.14);
+}
+
+.btn-solid {
+    /* make solid buttons act like the outline button: transparent with sweep animation */
+    background: transparent;
+    color: #fff;
+    border: 3px solid rgba(255, 255, 255, 0.95);
+    padding: 12px 18px;
+    border-radius: 999px;
+    position: relative;
+    overflow: hidden;
+    transition: color 280ms ease;
+}
+
+.btn-solid::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    transform: translateX(-100%);
+    transition: transform 1s cubic-bezier(.16, .84, .24, 1);
+    /* keep sweep clipped to the button shape */
+    border-radius: inherit;
+    -webkit-clip-path: inset(0 round inherit);
+    clip-path: inset(0 round inherit);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.btn-solid span {
+    position: relative;
+    z-index: 2;
+    transition: color 200ms ease;
+}
+
+/* Ensure inside the What We Believe hero the button text turns to black
+   while the white sweep animation is visible (hover/focus/active/persistent).
+   This makes the color change occur during the sweep, with a short fade.
+*/
+#what-we-believe .btn-outline:hover span,
+#what-we-believe .btn-outline:focus span,
+#what-we-believe .btn-outline:active span,
+#what-we-believe .btn-outline.active span,
+#what-we-believe .btn-solid:hover span,
+#what-we-believe .btn-solid:focus span,
+#what-we-believe .btn-solid:active span,
+#what-we-believe .btn-solid.active span {
+    color: #000 !important;
+}
+
+/* Also ensure the button itself uses a dark border when the sweep is visible */
+#what-we-believe .btn-outline:hover,
+#what-we-believe .btn-outline:focus,
+#what-we-believe .btn-outline:active,
+#what-we-believe .btn-outline.active,
+#what-we-believe .btn-solid:hover,
+#what-we-believe .btn-solid:focus,
+#what-we-believe .btn-solid:active,
+#what-we-believe .btn-solid.active {
+    border-color: rgba(0,0,0,0.12) !important;
+}
+
+/* Keep the belief hero's 'solid' button transparent by default so
+   it matches the outline button appearance when not selected. This
+   overrides the generic .hero .btn-solid mobile rule which targets
+   other hero buttons (like the "Watch online" CTA). */
+#what-we-believe .btn-solid {
+    background: transparent !important;
+    color: #fff !important;
+    border-color: rgba(255,255,255,0.95) !important;
+}
+
+.btn-solid:hover::before,
+.btn-solid:focus::before {
+    transform: translateX(0);
+}
+
+.btn-solid:hover,
+.btn-solid:focus {
+    color: #000;
+}
+
+/* specific styling for contact form submit button */
+#submit-evangelism {
+    /* make button obvious on white card */
+    background: #fff;
+    color: var(--brand-blue);
+    border-color: var(--brand-blue);
+}
+#submit-evangelism.sent {
+    /* turn green after sending */
+    color: #0a7;
+    border-color: #0a7;
+}
+
+/* allow any solid button to show sent state */
+.btn-solid.sent {
+    color: #0a7;
+    border-color: #0a7;
+}
+
+/* standard size for logos used in sections (not header or history) */
+.section-logo {
+    height: 64px;
+    width: auto;
+    display: block;
+    margin: 0 auto 12px;
+}
+
+/* shrink carousel height on narrow screens */
+@media (max-width: 600px) {
+    .feature-carousel {
+        height: 360px !important; /* override inline 800px */
+    }
+    /* give sections breathing room on very narrow screens */
+    .section .container {
+        max-width: 92%;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+    /* left-align join section text on small phones */
+    #join-evangelism .container {
+        text-align: left !important;
+    }
+    /* also left align contact form area on small phones */
+    #contact .feature-content {
+        text-align: left;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+    /* center again on very narrow (e.g. <400px) screens */
+    @media (max-width: 400px) {
+        #contact .feature-content {
+            text-align: center;
+        }
+    }
+    /* shrink text and input border on phone for contact section */
+    #contact .feature-content h2 { font-size: 1.5rem; }
+    #contact .feature-content p { font-size: 0.95rem; }
+    #contact .feature-content input,
+    #contact .feature-content textarea {
+        font-size: 0.95rem;
+        border-width: 1px;
+    }
+    #contact .feature-content .btn-solid {
+        padding: 8px 14px;
+        border-width: 2px;
+    }
+}
+
+.hero-cards {
+     /* placed in its own section; use positive spacing so the cards sit
+         clearly below the hero and have breathing room. Mobile rules will
+         continue to adjust flow when needed. */
+     position: relative;
+     /* remove negative overlap and center horizontally */
+     margin: 0 auto;
+     left: auto;
+     transform: none;
+     display: flex;
+     justify-content: center;
+     align-items: center; /* vertically center cards inside the section */
+     gap: 36px;
+     z-index: 3;
+     width: auto;
+     /* add modest vertical padding inside the cards container so the
+         cards have internal breathing room when the section height is larger */
+     padding: 40px 24px;
+}
+
+.card {
+    /* slightly smaller cards for a tighter look */
+    width: 480px;
+    border-radius: 22px; /* stronger rounding for cards */
+    overflow: hidden;
+    position: relative;
+    min-height: 340px;
+    /* give room for image + overlay text */
+}
+
+/* Make the image fill the whole card and sit behind the content */
+.card-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+/* subtle dark overlay to ensure text is readable */
+.card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.25) 100%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.card-body {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 20px;
+    z-index: 2;
+    color: #fff;
+    background: transparent;
+}
+
+.card-body h3 {
+    margin: 0 0 6px 0;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.card-body p {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #eee;
+    font-weight: 600;
+}
+
+.card-btn {
+    display: inline-block;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 3px solid rgba(255, 255, 255, 0.95);
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.card-btn {
+    font-weight: 700;
+}
+
+/* Add sweep animation like the hero outline button */
+.card-btn {
+    position: relative;
+    overflow: hidden;
+    transition: color 280ms ease;
+}
+
+.card-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    transform: translateX(-100%);
+    transition: transform 1s cubic-bezier(.16, .84, .24, 1);
+    /* ensure sweep doesn't overflow the card button's rounded corners */
+    border-radius: inherit;
+    -webkit-clip-path: inset(0 round inherit);
+    clip-path: inset(0 round inherit);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.card-btn span {
+    position: relative;
+    z-index: 2;
+}
+
+.card-btn:hover::before,
+.card-btn:focus::before {
+    transform: translateX(0);
+}
+
+/* Make card hover feel smooth and slightly lift the card */
+.card {
+    transition: transform 1s cubic-bezier(.16, .84, .24, 1), box-shadow 1s cubic-bezier(.16, .84, .24, 1);
+    will-change: transform, box-shadow;
+}
+
+.card:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 24px 60px rgba(2, 8, 20, 0.45);
+}
+
+.card:hover .card-body {
+    transform: translateY(-4px);
+    transition: transform 1s cubic-bezier(.16, .84, .24, 1);
+}
+
+/* Small YouTube icon for live CTA buttons */
+.live-btn .yt-icon {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.live-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Style the JOIN US LIVE button as YouTube red with white text/icon */
+.card-btn.live-btn,
+.live-btn.card-btn {
+    background: #ff0000 !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+}
+
+/* Ensure icon and text are white */
+.card-btn.live-btn .yt-icon,
+.card-btn.live-btn .yt-icon path {
+    color: #fff;
+    fill: currentColor;
+}
+
+/* Remove the white sweep overlay for the live button so it stays red */
+.card-btn.live-btn::before {
+    display: none !important;
+}
+
+/* Keep hover/focus legible: slightly darker red on hover */
+.card-btn.live-btn:hover,
+.card-btn.live-btn:focus {
+    background: #e60000 !important;
+    color: #ffffff !important;
+    outline: none;
+}
+
+/* Ensure the visible button text is white (override any other rules) */
+.card-btn.live-btn span {
+    color: #ffffff !important;
+}
+
+.card-btn:hover,
+.card-btn:focus {
+    color: #000;
+}
+
+/* persistent active state used by JS toggle */
+.card-btn.active::before {
+    transform: translateX(0);
+}
+
+.card-btn.active span {
+    color: #000;
+}
+
+.card-btn {
+    font-weight: 700;
+}
+
+.section {
+    /* universal vertical spacing between major sections */
+    padding: 80px 0; /* trimmed for tighter desktop spacing */
+}
+
+/* Increase space above the About section specifically so it clears the hero area */
+#about {
+    /* reduced from 400 to bring welcome block closer to hero cards */
+    padding-top: 220px;
+}
+
+.section.light {
+    /* plain white background for light sections */
+    background: #ffffff;
+    color: #111;
+}
+
+.section h2 {
+    color: var(--dark);
+    margin-bottom: 20px
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 18px
+}
+
+/* Latest message / video grid (matches site spacing and card sizes) */
+.video-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* increase gap to give the video and text more separation */
+    gap: 96px;
+    /* align the columns to the top so text sits level with the thumbnail */
+    align-items: start;
+}
+
+.video-card {
+    background: #000;
+    /* fallback while poster loads */
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    /* larger thumbnail height on desktop */
+    height: 520px;
+}
+
+@media (max-width: 1100px) {
+    .video-card { height: 440px; }
+}
+
+@media (max-width: 700px) {
+    .video-grid { grid-template-columns: 1fr; gap: 36px; display: flex; flex-direction: column; }
+    /* ensure the text appears first on narrow screens */
+    .video-info { order: 1; }
+    .video-card { order: 2; height: 320px; }
+    /* when CTA is moved into the grid we place it after the video and center it */
+    .video-grid .mobile-cta { order: 3; display: block; margin: 12px auto 0; align-self: center; }
+}
+
+/* Clickable thumbnail that looks like a video player */
+.video-thumb {
+    display: block;
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+    height: 100%;
+}
+
+.video-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* fill and crop like the example */
+}
+
+.play-icon {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 64px;
+    height: 64px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.play-icon::before {
+    content: "";
+    display: block;
+    width: 0;
+    height: 0;
+    border-left: 18px solid #fff;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+}
+
+.video-thumb:hover .play-icon,
+.video-thumb:focus .play-icon {
+    background: rgba(0, 0, 0, 0.75);
+    transform: translate(-50%, -50%) scale(1.04);
+}
+
+.video-info {
+    /* more padding for the text column and limit width for better whitespace */
+    padding: 40px 32px;
+    max-width: 600px;
+    color: #0b2a66;
+    /* base text color for Latest Message */
+}
+
+/* Match the screenshot: small badge icon before eyebrow, larger headline and decorative swash under the emphasized text */
+.video-info .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: #111;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 13px;
+}
+
+/* real image badge placed in the markup so it's easy to update */
+.video-info .eyebrow-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    object-fit: cover;
+    display: inline-block;
+}
+
+.video-title {
+    font-size: 56px;
+    line-height: 1.02;
+    margin: 10px 0 6px 0;
+    color: #0c2a68;
+    /* dark blue for better visibility */
+    font-weight: 900;
+}
+
+.video-em {
+    color: #79cfc7;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 6px;
+}
+
+/* decorative swash underline using an inline SVG as a background image */
+.video-em::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: -10px;
+    bottom: -6px;
+    height: 28px;
+    z-index: -1;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: 120% auto;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 40'><path d='M5 20 C60 5 120 35 300 18' stroke='%230c7470' stroke-width='10' stroke-linecap='round' fill='none' opacity='0.95'/></svg>");
+    opacity: 0.98;
+}
+
+/* Make the word "Live" red on the watch page (desktop + mobile) */
+#watch-page .video-em {
+    color: #e53935; /* red */
+}
+
+/* Match underline swash color to red on the watch page */
+#watch-page .video-em::after {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 40'><path d='M5 20 C60 5 120 35 300 18' stroke='%23e53935' stroke-width='10' stroke-linecap='round' fill='none' opacity='0.95'/></svg>");
+}
+
+/* short black divider under the eyebrow/left of the heading */
+.divider {
+    width: 56px;
+    height: 4px;
+    background: #111;
+    border-radius: 2px;
+    margin: 18px 0;
+}
+
+/* style the CTA to match the pill button in the screenshot */
+.btn-dark {
+    display: inline-block;
+    background: #111;
+    color: #fff;
+    padding: 14px 30px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 800;
+    letter-spacing: 1px;
+    box-shadow: none;
+}
+
+/* Ensure the latest message section leaves room for the overlapping hero-cards above it */
+#latest-message {
+    /* use the universal spacing so sections align consistently */
+    padding: 140px 0;
+    /* match the Welcome section spacing */
+    background: #072449;
+    color: #fff;
+}
+
+/* Desktop/webview tweaks: make the message thumbnail larger so the banner is more visible */
+@media (min-width: 1100px) {
+    .video-info {
+        padding: 56px 40px;
+        max-width: 560px;
+    }
+}
+
+/* Ensure text inside the latest-message section is readable on the dark background */
+#latest-message .video-info {
+    color: #fff;
+}
+
+#latest-message .video-title {
+    color: #ffffff;
+}
+
+#latest-message .video-desc,
+#latest-message .video-info .eyebrow span {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+#latest-message .divider {
+    background: rgba(255, 255, 255, 0.95);
+}
+
+/* Make the CTA stand out on the blue background: white pill with navy text */
+#latest-message .btn-dark {
+    background: #ffffff;
+    color: var(--brand-blue-dark);
+    box-shadow: none;
+}
+
+/* If video-em uses a swash, keep it visible (teal is fine) */
+#latest-message .video-em::after {
+    opacity: 1;
+}
+
+/* Removed duplicate .video-title/.video-em to avoid conflicting styles; primary
+   definitions above control size and color (and .video-em keeps its teal accent). */
+
+.video-desc {
+    color: #0b2a66;
+    /* match heading color */
+    margin-bottom: 18px;
+}
+
+/* Featured ministries section */
+/* #featured-ministries {
+    background: #fff;
+    color: #0f1111;
+    padding: 80px 0 120px;
+} */
+
+#featured-ministries .section-title {
+    text-align: center;
+    font-size: 48px;
+    font-weight: 900;
+    margin-bottom: 40px;
+    color: #0c2a68;
+    letter-spacing: 1px;
+}
+
+/* Make the emphasized word darker and give the swash more separation */
+#featured-ministries .section-title .video-em {
+    color: #7fd3ff; /* light blue accent for Ministries */
+    position: relative;
+    display: inline-block;
+    padding-bottom: 10px;
+    /* space between text and swash */
+}
+
+/* Override the decorative swash for the featured ministries heading */
+#featured-ministries .section-title .video-em::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: -10px;
+    bottom: -14px;
+    /* push the swash further down from the text */
+    height: 34px;
+    z-index: -1;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: 140% auto;
+    /* swash colored to match the light-blue Ministries text */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 40'><path d='M5 20 C60 5 120 35 300 18' stroke='%237fd3ff' stroke-width='12' stroke-linecap='round' fill='none' opacity='0.95'/></svg>");
+    opacity: 1;
+}
+
+/* Ensure ministries sit on a single row at larger viewports and match surrounding spacing */
+#featured-ministries {
+    padding: 120px 0; /* increase spacing to match other major sections */
+}
+
+#featured-ministries .ministries-grid {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    align-items: stretch;
+    /* keep cards on the same row at desktop widths */
+    flex-wrap: wrap;
+    overflow: visible;
+}
+
+#featured-ministries .card {
+    /* let cards distribute evenly across the row but maintain a sensible minimum */
+    flex: 0 0 22%;
+    min-width: 220px;
+    min-height: 380px;
+}
+
+/* Slightly stronger dark overlay for featured ministries cards to improve
+   text contrast on top of photographic backgrounds. This overrides the
+   default .card::before used elsewhere. */
+#featured-ministries .card::before {
+    background: linear-gradient(to bottom, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.78) 100%);
+    z-index: 1;
+}
+
+#featured-ministries .card-body {
+    padding: 20px;
+}
+
+#featured-ministries .card-body h3 {
+    color: #ffffff;
+    margin-bottom: 8px;
+}
+
+#featured-ministries .card-body p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+}
+
+@media (max-width:900px) {
+    #featured-ministries .section-title {
+        font-size: 28px;
+    }
+
+    /* revert to stacked cards on small screens */
+    #featured-ministries .ministries-grid { gap: 20px; }
+    #featured-ministries .card {
+        flex: 0 0 100%;
+        width: auto;
+        min-width: auto;
+        min-height: 260px;
+    }
+
+    #featured-ministries {
+        padding-bottom: 60px;
+    }
+}
+
+/* Stay connected / Oasis section */
+#stay-connected .stay-title {
+    font-size: 32px;
+    font-weight: 900;
+    color: #0c2a68;
+    letter-spacing: 1px;
+    margin: 6px 0 8px 0;
+}
+
+.stay-squiggle {
+    width: 120px;
+    height: 22px;
+    margin: 6px auto 12px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 20'><path d='M0 10 C40 0 80 20 200 10' stroke='%230c7470' stroke-width='6' stroke-linecap='round' fill='none' opacity='0.95'/></svg>");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.stay-desc {
+    max-width: 680px;
+    margin: 0 auto 12px;
+    color: #222;
+}
+
+@media (max-width:900px) {
+    #stay-connected .stay-title {
+        font-size: 22px;
+    }
+
+    .stay-squiggle {
+        width: 90px;
+        height: 14px;
+    }
+}
+
+.video-info .eyebrow span {
+    color: #0b2a66;
+}
+
+/* Find Us (location) section - use same blue gradient as latest-message */
+#find-us {
+    background: #072449;
+    color: #fff;
+    /* increase top/bottom padding to provide breathing room beneath the fixed header */
+    padding: 120px 0;
+}
+
+.find-grid {
+    display: flex;
+    gap: 32px;
+    align-items: stretch;
+}
+
+.location-card {
+    width: 48%;
+    text-align: center;
+    padding: 40px 44px;
+}
+
+.location-card h3 { color: #79cfc7; margin: 0 0 6px 0; font-weight:700; }
+.location-card h4 { margin: 6px 0 12px 0; color: #0f1112; font-weight:800; }
+.location-card p { color: rgba(0,0,0,0.65); margin-bottom:14px; }
+.location-card h4 { color: #ffffff; font-weight:800; }
+.location-card p { color: rgba(255,255,255,0.95); margin-bottom:14px; font-weight:600; }
+
+.location-card .postcode-row input {
+    width: 80%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #e6e6e6;
+    display: block;
+    margin: 0 auto;
+}
+
+.get-in-touch {
+    display: inline-block;
+    margin-top: 18px;
+    padding: 14px 28px;
+}
+
+.map-card { width: 52%; }
+
+/* Ensure the white min-card stands out on the blue background */
+.min-card.location-card {
+    background: transparent;
+    color: #fff;
+    box-shadow: none;
+}
+
+@media (max-width:900px) {
+    .find-grid { flex-direction: column; }
+    .location-card, .map-card { width: 100%; }
+    .map-card iframe { height: 320px; }
+    /* reduce the vertical padding on smaller screens so content remains reachable */
+    #find-us { padding: 72px 0; }
+}
+
+.btn-dark {
+    display: inline-block;
+    background: #111;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+@media (max-width:900px) {
+    .video-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .video-title {
+        font-size: 28px;
+    }
+}
+
+.min-card {
+    background: #fff;
+    padding: 36px;
+    border-radius: 12px;
+    color: #111;
+    text-align: center;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08)
+}
+
+/* Watch page: ensure video thumbnail blocks fit inside the card and text wraps
+   correctly without forcing overflow. Use min-width:0 on flex children so
+   they can shrink, and provide a responsive stacked layout on small screens. */
+#watch-page .min-card { overflow: hidden; }
+#watch-page .min-card .video-thumb { display: flex; align-items: center; gap: 18px; text-decoration: none; color: inherit; max-width: 100%; }
+#watch-page .min-card .video-thumb img { width: 240px; max-width: 45%; height: auto; object-fit: cover; border-radius: 18px; box-shadow: 0 8px 20px rgba(0,0,0,0.12); display: block; }
+#watch-page .min-card .video-thumb > div { flex: 1 1 auto; min-width: 0; }
+
+@media (max-width: 900px) {
+    #watch-page .min-card .video-thumb { flex-direction: column; align-items: stretch; }
+    #watch-page .min-card .video-thumb img { width: 100%; max-width: 100%; height: auto; margin-bottom: 12px; }
+    #watch-page .min-card .video-thumb > div { text-align: left; }
+}
+
+/* On small screens show Recent Streams first by reversing the grid order */
+@media (max-width: 900px) {
+    #watch-page .grid {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 16px;
+    }
+    #watch-page .grid > .min-card {
+        width: 100%;
+    }
+}
+
+.site-footer {
+    background: #0f1112;
+    /* add extra bottom padding so the last footer line is never clipped */
+    padding: 44px 0 64px;
+    color: #cfcfcf;
+    margin-top: 0;
+}
+
+/* Ensure the charity line is rendered as a block and visible */
+.site-footer .footer-charity { display: block; color: #ffffff !important; margin-top: 8px; font-size: 13px }
+
+@media (max-width:900px) {
+    /* avoid covering content on small screens */
+    .site-footer { margin-top: 0; }
+}
+
+.footer-grid {
+    display: flex;
+    justify-content: space-between
+}
+
+.footer-bottom {
+    text-align: center;
+    padding: 18px 0;
+    color: #7a7a7a
+}
+
+/* New footer column layout */
+.footer-col {
+    text-align: center;
+    flex: 1;
+    padding: 8px 12px;
+}
+
+.footer-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: rgba(121,207,199,0.06);
+    color: #79cfc7;
+    margin: 0 auto 10px auto;
+}
+
+/* Anchor-style footer buttons (dark-blue square with white icon) */
+.footer-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: #0c2a68; /* dark blue */
+    color: #ffffff;
+    margin: 0 auto 10px auto;
+    text-decoration: none;
+    transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.footer-btn svg { display: block; color: inherit; }
+.footer-btn:hover,
+.footer-btn:focus {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(12,42,104,0.18);
+    outline: none;
+}
+
+/* When a footer button is used to show a raw logo, remove the dark-blue
+   rounded square background so only the logo image is visible. */
+.footer-btn.footer-logo {
+    background: transparent;
+    box-shadow: none;
+    color: inherit;
+}
+.footer-btn.footer-logo img { display:block; margin: 0 auto; }
+
+/* Make footer logo image visually match the size of other footer icons.
+   This overrides inline sizing on the <img> elements so they appear larger. */
+.footer-btn.footer-logo {
+    width: 56px; /* same clickable square as other footer buttons */
+    height: 56px;
+}
+.footer-btn.footer-logo img {
+    width: 40px !important;
+    height: 40px !important;
+}
+
+.footer-col h4 {
+    margin: 6px 0 8px 0;
+    font-size: 18px;
+    color: #fff;
+    font-weight: 700;
+}
+
+.footer-col p { color: rgba(255,255,255,0.85); margin: 0; font-size: 13px }
+
+.footer-socials { display:inline-flex; gap:14px; align-items:center; justify-content:center }
+.social-link { color: rgba(255,255,255,0.85); display:inline-flex; align-items:center; justify-content:center }
+.social-link svg { display:block }
+.muted { color: #98a0a0; font-weight: 400 }
+
+@media (max-width:900px) {
+    .footer-grid { flex-direction: column; gap: 18px; align-items: center }
+    .footer-col { width: 100%; }
+}
+
+@media (max-width:900px) {
+    .hero-title {
+        font-size: 36px;
+        font-weight: 800;
+    }
+
+    .logo img {
+        height: 38px
+    }
+
+    .hero-cards {
+        flex-direction: column;
+        /* keep cards lower on mobile as well */
+        bottom: -240px
+    }
+
+    .card {
+        width: 90vw
+    }
+
+    .footer-grid {
+        flex-direction: column;
+        gap: 12px
+    }
+
+    .main-nav ul {
+        gap: 14px
+    }
+}
+
+/* Additional mobile adjustments to improve layout and stacking */
+
+/* hero variation used on Overseers page */
+.overseers-hero {
+    background-color: var(--brand-blue);
+}
+
+/* general overseer profile layout */
+.overseer-profile .profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+}
+
+/* add extra breathing room above the first and between profiles */
+.overseer-profile {
+    padding-top: 36px;
+    padding-bottom: 36px;
+}
+/* on wider screens make left column larger so image shifts left */
+@media(min-width:1000px) {
+    .overseer-profile .profile-grid {
+        grid-template-columns: 2fr 1fr;
+    }
+    .page-hero .overseer-profile {
+        padding-left: 60px; /* push profile into left area */
+    }
+}
+.overseer-profile .profile-img img {
+    width: 100%;
+    border-radius: 12px;
+    /* allow the image to grow on desktop; default cap is modest */
+    max-width: 640px;
+    display: block;
+}
+
+/* make the photo even bigger on very wide screens */
+@media(min-width:1000px) {
+    .overseer-profile .profile-img img {
+        max-width: 1000px;
+        
+    }
+}
+/* allow the flip-card to grow on very wide screens to match the image sizing */
+@media (min-width:1000px) {
+    .flip-card { max-width: 1000px; }
+}
+/* move profile upward when located in hero */
+.page-hero .overseer-profile {
+    transform: translateY(-8%);
+    -webkit-transform: translateY(-8%);
+    
+}
+
+.overseer-profile .profile-content h2 {
+    font-size: 32px;
+    margin-bottom: 8px;
+    top: -250px;
+    left: 0px;
+}
+
+/* make the shout line extra-large (larger than the h2) */
+.overseer-profile .profile-content p.shout {
+    font-size: 46px;
+    margin: 6px 0;
+    line-height: 1.1;
+    top: -250px;
+    left: 0px;
+}
+
+.overseer-profile .profile-content p {
+    margin: 6px 0;
+}
+.overseer-profile .social-links {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+    /* stack below text and center under profile content */
+    justify-content: center;
+}
+/* ensure social icons don't float beside text on wide screens */
+.overseer-profile .profile-content {
+    text-align: center;
+}
+@media (max-width:1000px) {
+    .overseer-profile .profile-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    .overseer-profile .profile-img {
+        margin: 0 auto;
+    }
+}
+
+/* flip card for overseer image biography */
+.overseer-profile .profile-img {
+    /* allow bigger photo so viewers don't need to scroll the back content */
+    max-width: 100%;
+    max-height: 500px;
+    margin: 0 auto;
+}
+
+.flip-card {
+    position: relative;
+    perspective: 1000px;
+    width: 100%;
+    /* let the card size to the image naturally rather than forcing a fixed height */
+    height: auto;
+    display: inline-block;
+    /* keep a sensible max width on desktop; image itself controls final size */
+    max-width: 640px;
+}
+
+.flip-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+    /* smoother, slower flip with ease-in-out */
+    transition: transform 0.8s ease-in-out;
+    backface-visibility: hidden;
+}
+
+.flip-card-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--brand-blue);
+    color: #fff;
+    padding: 24px;
+    overflow-y: auto;
+    border-radius: 12px;
+    transform: rotateY(180deg);
+    font-size: 14px;
+    line-height: 1.5;
+    backface-visibility: hidden;
+    word-wrap: break-word;
+    transition: transform 0.8s ease-in-out;
+}
+
+.flip-card:hover img {
+    transform: rotateY(180deg);
+}
+
+.flip-card:hover .flip-card-back {
+    transform: rotateY(360deg);
+}
+
+/* mobile-specific: disable hover transforms and support persistent flip via class */
+@media (max-width: 700px) {
+    .flip-card:hover img,
+    .flip-card:hover .flip-card-back {
+        transform: none !important;
+    }
+    .flip-card.flipped img {
+        transform: rotateY(180deg) !important;
+    }
+    .flip-card.flipped .flip-card-back {
+        transform: rotateY(360deg) !important;
+    }
+}
+
+/* Mobile tweaks: reduce overseer image height and large shout text */
+@media (max-width: 700px) {
+    .overseer-profile .profile-img {
+        max-height: 340px; /* reduce image container height on phones */
+        position: relative;
+        /* bring the photo up slightly if desired, but avoid drastic shift */
+        top: -80px;
+        left: 0;
+        z-index: 5;
+    }
+
+    /* fix flip-card dimensions and make image cover the box cleanly */
+    .flip-card, .flip-card img, .flip-card-back {
+        height: 320px;
+    }
+
+    .flip-card {
+        overflow: hidden; /* ensure nothing spills out when image scales */
+    }
+
+    .flip-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* fill container without distortion */
+        object-position: center;
+    }
+
+    .overseer-profile .profile-content p.shout {
+        font-size: 28px; /* smaller shout line for mobile */
+        margin-top: 8px;
+    }
+
+    /* show the biography panel full‑height inside the card on mobile */
+    .flip-card-back {
+        top: 0;
+        height: 100%;
+        padding-top: 24px;
+        overflow-y: auto;
+    }
+
+    /* continental slide adjustments no longer needed; keep consistent with general */
+    .overseer-slide[data-role="continental"] .flip-card {
+        transform: none;
+        -webkit-transform: none;
+    }
+    .overseer-slide[data-role="continental"] .flip-card-back {
+        top: 0;
+        height: 100%;
+        padding-top: 24px;
+    }
+
+    /* hide the inline pastor name under the image on small screens to avoid overlap */
+    .flip-card .muted-italic { display: none !important; }
+}
+
+/* Page hero specific styles for 'Who We Are' */
+.page-hero {
+    position: relative;
+    height: 100vh; /* make hero full viewport height */
+    min-height: 0;
+    display: block;
+    overflow: hidden;
+}
+.page-hero .slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    /* ensure the image fills the viewport area */
+    transform-origin: center;
+    z-index: 1;
+}
+.page-hero .hero-overlay {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    /* place the text block below the centered figures */
+    align-items: flex-end;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    /* place text closer under the figures */
+    padding-bottom: 40px;
+}
+.page-hero .hero-title {
+    font-size: 68px;
+    line-height: 1.02;
+    font-weight: 900;
+    color: #fff;
+    margin: 0;
+    text-shadow: 0 8px 26px rgba(0,0,0,0.6);
+}
+.page-hero .hero-title .accent {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 6px;
+}
+.page-hero .hero-title .accent::after {
+    content: "";
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: 0;
+    height: 14px;
+    background: rgba(10,160,140,0.18);
+    border-radius: 12px;
+    z-index: -1;
+    transform: translateY(6px);
+}
+.page-hero .hero-subtitle {
+    margin-top: 14px;
+    color: rgba(255,255,255,0.92);
+    font-size: 16px;
+}
+
+@media (max-width:900px) {
+    .page-hero { height: 60vh; min-height: 420px }
+    .page-hero .hero-title { font-size: 36px }
+    .page-hero .hero-title .accent::after { height: 10px; transform: translateY(5px) }
+    .page-hero .hero-subtitle { font-size: 14px }
+    /* reduce bottom padding on small screens so text stays visible */
+    .page-hero .hero-overlay { padding-bottom: 30px; align-items: flex-end }
+
+    /* On narrower phones, add top padding so the hero image sits further below the fixed header */
+    @media (max-width: 700px) {
+        .page-hero {
+            padding-top: 140px;
+            height: auto; /* let content determine height now padding is applied */
+            min-height: 420px;
+            box-sizing: border-box;
+        }
+    }
+
+    /* Make the hero "Watch online" button black specifically on small screens.
+       This targets solid hero CTAs linking to YouTube (anchor href contains "youtube"). */
+    @media (max-width: 700px) {
+        .hero a.btn-solid[href*="youtube"] {
+            background: var(--brand-blue-dark) !important;
+            color: #fff !important;
+            border-color: rgba(0,0,0,0.12) !important;
+        }
+        .hero a.btn-solid[href*="youtube"]::before { background: var(--brand-blue-dark); }
+        .hero a.btn-solid[href*="youtube"]:hover,
+        .hero a.btn-solid[href*="youtube"]:focus {
+            color: #fff !important;
+        }
+    }
+
+    /* Also make the hero "Join us" outline CTA black on mobile for consistent contrast */
+    @media (max-width: 700px) {
+        .hero a.btn-outline.btn-join {
+            background: var(--brand-blue-dark) !important;
+            color: #fff !important;
+            border-color: rgba(0,0,0,0.12) !important;
+            box-shadow: none !important;
+        }
+
+        .hero a.btn-outline.btn-join span { color: #fff !important; }
+
+        .hero a.btn-outline.btn-join:hover,
+        .hero a.btn-outline.btn-join:focus {
+            color: #fff !important;
+            border-color: rgba(255,255,255,0.06) !important;
+        }
+    }
+}
+@media (max-width:900px) {
+
+    /* make hero adapt rather than fixed-height so cards can flow */
+    .hero {
+        height: auto;
+        padding-bottom: 24px;
+        align-items: flex-start;
+    }
+
+    /* move hero cards into the document flow so they appear below the hero */
+    .hero-cards {
+        position: static;
+        transform: none;
+        left: auto;
+        bottom: auto;
+        /* increase top spacing so the cards clear the hero nicely */
+        margin-top: 36px;
+        width: 100%;
+        align-items: center;
+        gap: 20px;
+        justify-content: center;
+    }
+
+    /* slightly smaller card images on phones */
+    .card-img {
+        height: 140px;
+    }
+
+    /* slightly reduce container side padding on small screens */
+    .container {
+        padding: 0 12px;
+    }
+}
+
+/* Feature blocks used on the About section */
+.feature {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* tightened gap so adjacent feature boxes sit closer together */
+    gap: 20px;
+    align-items: center;
+    /* much smaller vertical margin to match the top spacing */
+    margin: 12px 0 20px;
+}
+
+/* .feature.reverse ruleset removed as it was empty */
+
+.feature-content h2 {
+    font-size: 34px;
+    line-height: 1.02;
+    margin: 0 0 12px 0;
+    color: #0c2a68;
+    font-weight: 700;
+}
+
+/* Small logo/badge that appears above feature headings */
+.feature-badge {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+/* ensure the "CHECK OUT MORE MESSAGES" button stays on one line */
+#latest-message .btn {
+    white-space: nowrap;
+}
+
+.feature-badge img {
+    height: 84px;
+    width: auto;
+    display: block;
+}
+
+.feature-content p {
+    color: #222;
+    margin-bottom: 12px;
+}
+
+/* Ensure feature content vertically centers next to taller images */
+.feature-content {
+    align-self: center;
+}
+
+/* Center the overview's badge/logo and description for the Children page */
+#children-overview .feature-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* shift the overview text a bit to the right so it doesn't run into the image */
+    padding-left: 80px;
+    box-sizing: border-box;
+}
+#children-overview .feature-badge img {
+    display: block;
+    margin: 0 auto 12px;
+}
+#children-overview .feature-desc {
+    max-width: 680px;
+    margin: 8px 0 18px;
+}
+
+@media (max-width: 900px) {
+    #children-overview .feature-content { padding-left: 0; }
+}
+
+/* Remove displayed captions/descriptions that appear with the feature carousels
+   on the Children page so text does not appear over or near large images. */
+#children-overview .carousel-caption,
+#children-overview .carousel-description {
+    display: none !important;
+}
+
+/* Also hide optional caption updates injected by JS inside the carousel host */
+#children-overview .feature-carousel + .carousel-caption { display: none !important; }
+
+/* ----------------------------------------------------------------------
+   Mobile tweaks: ensure button labels sit on a single line and buttons
+   don't balloon too wide on small screens. Reduce font-size and padding
+   for narrow viewports so text remains legible and contained.
+   ---------------------------------------------------------------------- */
+@media (max-width: 600px) {
+    .btn {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+    .btn span {
+        white-space: nowrap;
+    }
+    /* keep carousel frames wide even on phones */
+    .feature-carousel {
+        aspect-ratio: 16/9;
+        min-height: 250px;
+    }
+}
+
+/* smaller text for the belief question on phones */
+@media (max-width: 600px) {
+    #what-we-believe .hero-title {
+        font-size: 32px !important;
+    }
+    .belief-msg {
+        font-size: 1rem !important;
+    }
+}
+
+/* Limit large feature images to keep the visual balance and vertical alignment */
+.feature-img img {
+    max-height: 520px;
+    width: 100%;
+    object-fit: cover;
+}
+
+/* Center action buttons in the feature content without centering the text */
+.feature-content .btn {
+    display: block;
+    width: max-content;
+    margin: 18px auto 0;
+}
+
+.feature .muted-italic {
+    font-style: italic;
+    color: #6b6b6b;
+    margin-bottom: 18px;
+}
+
+.feature-img {
+    position: relative;
+}
+
+.feature-img img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 14px;
+}
+
+.feature-img::after {
+    display: none; /* decorative offset removed — image sits flush without shadow */
+}
+
+.feature-carousel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    /* prefer a wider (landscape) ratio so slides don’t look tall on desktop */
+    aspect-ratio: 16/9;
+    min-height: 420px; /* shorter base height helps maintain landscape shape */
+    border-radius: 14px;
+    /* allow indicators to sit outside the image area */
+    overflow: visible;
+    padding-right: 44px;
+}
+
+/* Reduce carousel height specifically on the Children page */
+#children-overview .feature-carousel {
+    min-height: 500px; /* smaller image box for children section */
+}
+
+/* bring the overview section closer to the top on phones */
+@media (max-width: 600px) {
+    /* cancel the generous inline padding added in HTML */
+    #children-overview { padding-top: 24px !important; }
+    /* tighten spacing between age blocks too */
+    #children-overview .feature { margin-top: 24px !important; }
+    /* Reduce children carousel height on phones and center it */
+    #children-overview .feature-carousel {
+        min-height: 220px;
+        max-height: 360px;
+        aspect-ratio: 3/4;
+        width: 92%;
+        max-width: 420px;
+        margin: 8px auto 0 auto;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+}
+
+/* Caption that sits below small carousels (used for leader names) */
+.carousel-caption {
+    text-align: center;
+    margin-top: 12px;
+    font-weight: 700;
+    color: #062246;
+    font-size: 16px;
+}
+
+/* Utility: visually hide content but keep it accessible to screen readers */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Visible description text under leader carousel */
+.carousel-description {
+    text-align: center;
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+}
+.feature-carousel .feature-slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 900ms ease;
+    will-change: opacity;
+}
+.feature-carousel .feature-slide {
+    border-radius: 8px; /* rounded corners for each slide */
+    box-shadow: none;
+    overflow: hidden;
+}
+.feature-carousel .feature-slide.active {
+    opacity: 1;
+    z-index: 2;
+}
+
+/* Vertical indicators on the left (small dots) */
+.feature-carousel-indicators {
+    position: absolute;
+    /* place the vertical dots just outside the left edge of the image */
+    left: -28px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 8;
+}
+.feature-carousel-indicators button {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    border: none;
+    background: rgba(30,115,255,0.16); /* light blue for inactive */
+    padding: 0;
+    cursor: pointer;
+    transition: transform 160ms ease, background-color 160ms ease;
+}
+
+
+.feature-carousel-indicators button.active {
+    background: #1e73ff; /* vivid blue */
+    box-shadow: 0 4px 12px rgba(30,115,255,0.22);
+    transform: scale(1.12);
+}
+
+@media (max-width:900px) {
+    .feature-carousel { min-height: 420px; padding-right: 14px }
+    /* on small screens keep indicators inside the image to avoid overflow */
+    .feature-carousel-indicators { right: 10px; gap:8px }
+    /* special case for children overview: carousel should be full width and centred */
+    #children-overview .feature-carousel { padding-right: 0; }
+    #children-overview .feature-img {
+        display: flex;
+        justify-content: center;
+    }
+}
+
+/* For reversed feature blocks (image on left), place indicators on the left side */
+.feature.reverse .feature-carousel {
+    /* place space on the left so indicators sit outside the image */
+
+/* belief interaction styles */
+.belief-buttons .btn {
+    min-width: 120px;
+}
+.belief-msg {
+    color: var(--text);
+}
+.belief-msg.success {
+    color: #2b8a3e !important;
+}
+.belief-msg.error {
+    color: #cc0000 !important;
+}
+
+/* highlight the word Christ green (stronger rule to override inline color) */
+.christ-em,
+.question-mark,
+.page-hero .hero-title .christ-em,
+.page-hero .hero-title .question-mark {
+    color: #2b8a3e !important;
+}
+
+/* fade-out animation for belief message */
+@keyframes fadeOut {
+    to { opacity: 0; }
+}
+.belief-msg.fade-out {
+    animation: fadeOut 1s forwards;
+}
+
+/* Ensure the 'No' button text turns black (not blue) when the white
+   sweep animation is visible or when the button is active/focused. This
+   targets the specific #belief-no control to override broader rules. */
+#belief-no:active,
+#belief-no:focus,
+#belief-no.active {
+    color: #000 !important;
+    border-color: rgba(0,0,0,0.12) !important;
+}
+#belief-no:active span,
+#belief-no:focus span,
+#belief-no.active span {
+    color: #000 !important;
+}
+
+    padding-left: 44px;
+    padding-right: 0;
+}
+
+.feature.reverse .feature-carousel-indicators {
+    /* override already left by default - keep for clarity */
+    left: -28px;
+    right: auto;
+}
+
+@media (max-width:900px) {
+    /* on small screens keep indicators inside the image to avoid overflow */
+    .feature.reverse .feature-carousel { padding-left: 14px }
+    .feature.reverse .feature-carousel-indicators { left: 10px; right: auto }
+    /* when a specific feature opts for right-side indicators */
+    .feature.indicators-right .feature-carousel-indicators { left: auto; right: 10px; }
+}
+
+/* Special case: the About section uses .feature.indicators-right but the
+   design places indicators on the LEFT for mobile — move them left on
+   small viewports so mobile users see controls beside the image. */
+@media (max-width:900px) {
+    #about .feature.indicators-right .feature-carousel-indicators {
+        left: 10px !important;
+        right: auto !important;
+    }
+}
+
+/* right-side indicator class (overrides the global left rule) */
+.feature.indicators-right .feature-carousel-indicators,
+.indicators-right .feature-carousel-indicators {
+    left: auto;
+    right: -28px;
+}
+
+/* also support arbitrary indicator-right containers like leader-photo */
+@media (max-width:900px) {
+    .feature.indicators-right .feature-carousel-indicators,
+    .indicators-right .feature-carousel-indicators {
+        left: auto;
+        right: 10px;
+    }
+}
+
+/* make the leaders carousel a portrait card on desktop so it sits beside
+   the intro text and doesn't stretch full-width. Mobile rules below remain. */
+#meet-leaders .feature-carousel {
+    /* keep a reasonable minimum height but constrain width to a portrait card */
+    min-height: 520px;
+    width: 420px;
+    max-width: 100%;
+    aspect-ratio: 3/4;
+    border-radius: 18px;
+    /* allow indicators to sit outside the image area so dots can appear at the edge */
+    overflow: visible;
+}
+
+/* Place the vertical indicator dots on the right side of the leaders carousel */
+#meet-leaders .feature-carousel-indicators {
+    left: auto;
+    right: -28px;
+}
+
+/* reduce on narrow phones to avoid taking too much space; keep compact on small devices */
+@media (max-width: 600px) {
+    #meet-leaders .feature-carousel {
+        /* reduced from 340px to 220px for better mobile fit */
+        min-height: 220px;
+        max-height: 320px;
+    }
+
+    /* Make the leader carousel portrait and centered on phones */
+    .leader-photo { display: flex; justify-content: center; }
+    #meet-leaders .feature-carousel {
+        aspect-ratio: 3/4; /* portrait ratio (width / height) */
+        width: 280px;
+        max-width: 86%;
+        margin: 0 auto;
+        min-height: auto; /* let aspect-ratio control height */
+        border-radius: 18px;
+        overflow: hidden;
+    }
+}
+
+/* extra compact sizing for very small phones */
+@media (max-width: 420px) {
+    #meet-leaders .feature-carousel {
+        min-height: 180px;
+        max-height: 260px;
+    }
+
+    /* extra compact portrait sizing for very small phones */
+    .leader-photo { display:flex; flex-direction:column; align-items:center }
+    #meet-leaders .feature-carousel {
+        width: 260px;
+        max-width: 92%;
+        aspect-ratio: 3/4;
+        border-radius: 14px;
+        margin-bottom: 8px;
+    }
+    .leader-photo .carousel-caption { font-size: 16px }
+}
+
+/* Remove decorative shadow for reversed feature images when a clean look is desired */
+.feature.reverse .feature-img::after {
+    display: none;
+}
+
+/* Carousel navigation (left-side) */
+/* carousel controls removed — controls are intentionally hidden for a cleaner look */
+
+@media (max-width:900px) {
+    .feature {
+        grid-template-columns: 1fr;
+    }
+
+    .feature-img::after {
+        left: -12px;
+        top: -12px;
+    }
+
+    /* slightly smaller logo on narrow screens */
+    .feature-badge img {
+        height: 48px;
+    }
+}
+
+/* Specific adjustments for the Welcome (About) feature: make the image larger
+   and remove the decorative shadow/background so the photo sits flush. */
+#about .feature:first-of-type {
+    grid-template-columns: 1fr 1.2fr; /* give the image column a bit more width */
+}
+
+#about .feature:first-of-type .feature-img::after {
+    display: none; /* remove the navy offset background for the welcome image */
+}
+
+#about .feature:first-of-type .feature-img img {
+    max-height: 760px; /* allow the image to grow slightly taller */
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+@media (max-width:900px) {
+    /* keep the stacked layout on smaller screens and avoid overflow */
+    #about .feature:first-of-type { grid-template-columns: 1fr }
+    #about .feature:first-of-type .feature-img img { max-height: 480px }
+}
+
+/* Match the same treatment for the second (reverse) feature block: remove
+   its decorative background and allow the image to be larger for visual balance. */
+#about .feature.reverse {
+    grid-template-columns: 1.2fr 1fr; /* give the image column more space */
+}
+
+#about .feature.reverse .feature-img::after {
+    display: none; /* remove offset shadow/background */
+}
+
+#about .feature.reverse .feature-img img {
+    max-height: 760px;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 14px;
+}
+
+@media (max-width:900px) {
+    #about .feature.reverse { grid-template-columns: 1fr }
+    #about .feature.reverse .feature-img img { max-height: 480px }
+}
+
+/* Make the Find Us button (location) white with black text, and
+   make the top hero "Join us" button match visually. Keep hover
+   states stable so color doesn't invert unexpectedly. */
+#find-us-btn,
+.hero-cta .btn-join {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: rgba(0,0,0,0.08) !important;
+    box-shadow: none !important;
+}
+
+/* Ensure the visible text stays black (some buttons use spans) */
+#find-us-btn span,
+.hero-cta .btn-join span {
+    color: #000000 !important;
+}
+
+/* Disable the sweep/overlay effect for the hero join button so it
+   remains a solid white pill rather than showing animated overlays. */
+.hero-cta .btn-join::before {
+    display: none !important;
+}
+
+/* Keep hover/focus consistent */
+#find-us-btn:hover,
+.hero-cta .btn-join:hover,
+#find-us-btn:focus,
+.hero-cta .btn-join:focus {
+    background: #ffffff !important;
+    color: #000000 !important;
+    outline: 2px solid rgba(0,0,0,0.06);
+}
+
+/* Back to top button (bottom-right) */
+.back-to-top {
+    position: fixed;
+    right: 20px;
+    bottom: 22px;
+    width: 48px;
+    height: 48px;
+    border-radius: 999px;
+    background: var(--brand-blue);
+    color: #fff;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 220ms ease, transform 220ms ease;
+    z-index: 200;
+    cursor: pointer;
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.back-to-top svg { display: block; }
+
+@media (max-width:600px) {
+    /* Ensure hero-cards are centered and stacked when we position them fixed via JS */
+    .hero-cards {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        align-items: center !important;
+        width: calc(100% - 28px) !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+    }
+
+    .hero-cards .card {
+        width: 100% !important;
+        max-width: 520px !important;
+        min-height: auto !important;
+        border-radius: 14px !important;
+    }
+    .back-to-top { right: 12px; bottom: 16px; width:44px; height:44px; }
+}
+
+/* Smaller back-to-top sizes for narrow phones */
+@media (max-width:420px) {
+    .back-to-top { width: 36px; height: 36px; right: 10px; bottom: 12px; }
+    .back-to-top svg { width: 16px; height: 16px; }
+}
+
+@media (max-width:360px) {
+    .back-to-top { width: 32px; height: 32px; right: 8px; bottom: 10px; }
+    .back-to-top svg { width: 14px; height: 14px; }
+}
+
+/* Strong mobile override: ensure hero card images fill their box.
+   This overrides a later `.card-img { height: 200px }` rule that was
+   preventing the aspect-ratio technique from working. */
+@media (max-width: 700px) {
+    .hero-cards .card .card-img {
+        height: auto !important;
+        padding-top: 75% !important; /* keep near-square aspect */
+        background-size: cover !important;
+        background-position: center center !important;
+        display: block !important;
+    }
+
+    /* Remove any fixed height on the generic selector to avoid conflicts */
+    .card-img { height: auto !important; }
+}
+
+/* Nudge feature/card images slightly to the right on narrow phones so important
+   artwork (text/logo) isn't cropped at the left edge. Tweak the percentage as needed. */
+@media (max-width:480px) {
+    .feature-img img { object-position: 55% center !important; }
+    .card-img { background-position: 55% center !important; }
+    .feature-carousel .feature-slide { background-position: 55% center !important; }
+}
+
+/* Further reduce Give button size on narrow phones */
+@media (max-width:480px) {
+    .nav-wrap .btn-give,
+    .main-nav .mobile-nav-give {
+        padding: 6px 8px !important;
+        font-size: 13px !important;
+        border-radius: 8px !important;
+        max-width: 120px !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* make sure the mobile menu give button doesn't stretch full width */
+    .main-nav .mobile-nav-give { display: inline-block; width: auto; }
+}
+
+/* Compact header on phones: smaller logo + title and tighter header padding */
+@media (max-width:600px) {
+  .site-header { padding: 6px 0; }
+  .nav-wrap { padding: 8px 0; gap: 8px }
+  .site-header .logo img { height: 28px; }
+  .site-header .logo span { font-size: 16px; letter-spacing: 0.6px }
+}
+
+/* Center the visit-promo logo and headline on phones */
+@media (max-width:600px) {
+        .visit-header { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; }
+        .visit-header .eyebrow { text-align:center; }
+        .visit-logo { width: 84px; height: auto; margin: 0; }
+        .visit-content { text-align: center; }
+        .visit-buttons { justify-content: center; }
+}
+
+/* Show the about-section feature images on phones and center them under text */
+@media (max-width:600px) {
+    #about .feature {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 0 8px;
+    }
+
+    #about .feature-img {
+        display: block;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    /* reduce carousel height for phone to avoid large blank areas */
+    #about .feature-img .feature-carousel { min-height: 200px; }
+    #about .feature-img img { max-height: 260px; object-fit: cover; border-radius: 14px; }
+
+    #about .feature-content { text-align: center; }
+
+    /* For reversed feature blocks, show the image beneath the content on phones */
+    #about .feature.reverse { flex-direction: column-reverse; }
+}
+
+/* Tighter spacing for hero and featured ministries on small phones */
+@media (max-width:420px) {
+    /* reduce top spacing inside page heroes */
+    .page-hero .hero-overlay { padding-top: 6px; padding-bottom: 6px; }
+
+    /* shrink the 'What We Believe' hero to remove large beige gap */
+    #what-we-believe.hero { margin-top: 8px; padding-top: 10px; padding-bottom: 10px; min-height: 140px; }
+
+    /* reduce featured ministries vertical padding and gaps */
+    #featured-ministries { padding: 28px 0; }
+    #featured-ministries .section-title { margin-bottom: 8px; }
+    #featured-ministries .ministries-grid { gap: 10px; }
+}
+
+/* Ensure about-section reversed features always show content above image on phones
+   (extra specific rule near EOF so it overrides earlier rules). */
+@media (max-width:600px) {
+    #about .feature.reverse { display:flex !important; flex-direction: column !important; }
+    #about .feature.reverse .feature-content { order: 1 !important }
+    #about .feature.reverse .feature-img { order: 2 !important; width: 100% !important }
+    #about .feature.reverse .feature-img img { max-height: 320px; object-fit: cover }
+}
+
+/* Chatbot (bottom-left) */
+.chat-toggle {
+    position: fixed;
+    left: 20px;
+    bottom: 22px;
+    width: 56px;
+    height: 56px;
+    border-radius: 999px;
+    background: transparent;
+    border: none;
+    padding: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 400;
+    cursor: pointer;
+    /* remove default focus ring / tap highlight on mobile */
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Make the chat toggle match the back-to-top brand blue */
+.chat-toggle {
+    background: var(--brand-blue) !important;
+    color: #fff;
+}
+
+/* Hide the svg outer circle (button background is handled by the element itself) */
+.chat-toggle svg circle[r="30"] { fill: transparent !important; }
+
+/* Ensure the face stays white and eyes/mouth use the brand blue for contrast */
+.chat-toggle svg rect { fill: #fff !important; }
+.chat-toggle svg circle[r="3"] { fill: var(--brand-blue) !important; }
+.chat-toggle svg path { stroke: var(--brand-blue) !important; }
+
+.chat-toggle:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.chat-window {
+    position: fixed;
+    left: 16px;
+    bottom: 92px;
+    width: 320px;
+    max-width: calc(100vw - 40px);
+    height: 420px;
+    display: flex;
+    flex-direction: column;
+    /* Match the pill's translucency: dark frosted glass with subtle gradient and stronger blur */
+    background: linear-gradient(180deg, rgba(8,14,28,0.72), rgba(6,10,18,0.56));
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 14px 36px rgba(3,18,40,0.24);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.04);
+    transform: translateY(12px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease, transform 200ms ease;
+    z-index: 390;
+}
+
+.chat-window[aria-hidden="false"] {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Explicit open/close animations so the chat has a friendly entrance */
+.chat-window.opening {
+    animation: chat-open 260ms cubic-bezier(.2,.9,.24,1) both;
+}
+.chat-window.closing {
+    animation: chat-close 200ms cubic-bezier(.4,0,.22,1) both;
+}
+
+@keyframes chat-open {
+    0% { transform: translateY(18px) scale(0.98); opacity: 0; }
+    60% { transform: translateY(-6px) scale(1.02); opacity: 1; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes chat-close {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(14px) scale(0.98); opacity: 0; }
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.chat-title { display:flex; align-items:center; gap:8px; }
+.chat-title strong { font-size:14px; }
+.chat-close { background:transparent; color:#fff; border:none; font-size:18px; cursor:pointer }
+
+.chat-messages { padding: 12px; overflow:auto; flex:1; display:flex; flex-direction:column; gap:10px; }
+
+.chat-msg { max-width:86%; padding:10px 12px; border-radius:10px; font-size:13px; line-height:1.2 }
+.chat-msg.bot { align-self:flex-start; background: rgba(255,255,255,0.08); color:#fff; border-bottom-left-radius:2px }
+.chat-msg.user { align-self:flex-end; background: rgba(255,255,255,0.95); color:#0b203f; border-bottom-right-radius:2px }
+
+.chat-form { display:flex; gap:8px; padding:10px; border-top:1px solid rgba(255,255,255,0.04) }
+.chat-input { flex:1; padding:8px 10px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.06); color:#fff }
+    /* Use the same very-dark blue as the closed-chat FAB for consistency */
+    .chat-send { background: var(--brand-blue-dark); color:#fff; border:none; padding:8px 12px; border-radius:12px; cursor:pointer }
+
+    /* Header icon (small chat badge) should match the closed FAB color */
+    .chat-header svg circle { fill: var(--brand-blue-dark); }
+    .chat-header svg rect { fill: #fff; }
+    /* Hide any decorative path (smile) inside the chat header so it shows the simple badge */
+    .chat-header svg path { display: none !important; }
+
+/* Animate chatbot toggle: subtle wave, blinking eyes, and mouth 'smile' */
+.chat-toggle svg { display:block; width:100%; height:100%; transform-origin: 50% 50%; animation: chat-toggle-breathe 6s ease-in-out infinite; }
+
+/* Target small circle eyes (r=3) for blinking */
+.chat-toggle svg circle[r="3"] {
+    transform-origin: 50% 50%;
+    transform-box: fill-box;
+    animation: chat-eye-blink 5s steps(1,start) infinite;
+}
+
+/* Target the smile path by stroke color to give a little smile movement */
+.chat-toggle svg path[stroke="#1e73ff"] {
+    transform-origin: 50% 50%;
+    transform-box: fill-box;
+    animation: chat-mouth-smile 6s ease-in-out infinite;
+}
+
+@keyframes chat-toggle-breathe {
+    0% { transform: translateY(0) rotate(0deg) }
+    25% { transform: translateY(-2px) rotate(3deg) }
+    50% { transform: translateY(0) rotate(-3deg) }
+    75% { transform: translateY(-1px) rotate(2deg) }
+    100% { transform: translateY(0) rotate(0deg) }
+}
+
+@keyframes chat-eye-blink {
+    0%, 92% { transform: scaleY(1) }
+    93% { transform: scaleY(0.12) }
+    95% { transform: scaleY(1) }
+    100% { transform: scaleY(1) }
+}
+
+@keyframes chat-mouth-smile {
+    0% { transform: translateY(0) scaleX(1) }
+    40% { transform: translateY(0) scaleX(1) }
+    50% { transform: translateY(-1px) scaleX(1.04) }
+    60% { transform: translateY(0) scaleX(1) }
+    100% { transform: translateY(0) scaleX(1) }
+}
+
+/* Increase animation on hover to feel responsive */
+.chat-toggle:hover svg { animation-duration: 2.2s; }
+.chat-toggle:hover svg circle[r="3"] { animation-duration: 1.8s }
+.chat-toggle:hover svg path[stroke="#1e73ff"] { animation-duration: 2s }
+
+@media (max-width:480px) {
+    .chat-window { right:12px; left:auto; width:auto; bottom:84px; height:360px }
+    .chat-toggle { right:12px; left:auto; }
+}
+
+/* Typing indicator for bot: three animated dots */
+.chat-typing {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+}
+.typing-dots { display: inline-block; width:36px; text-align:left }
+.typing-dots span { display:inline-block; width:6px; height:6px; margin-right:6px; background: #fff; border-radius:50%; opacity:0.2; transform: translateY(0); animation: dot 1s infinite linear; }
+.typing-dots span:nth-child(1){ animation-delay: 0s }
+.typing-dots span:nth-child(2){ animation-delay: 0.12s }
+.typing-dots span:nth-child(3){ animation-delay: 0.24s }
+
+@keyframes dot {
+    0% { opacity: 0.18; transform: translateY(0) }
+    50% { opacity: 1; transform: translateY(-4px) }
+    100% { opacity: 0.18; transform: translateY(0) }
+}
+
+/* Ensure the typing indicator appears as a full chat bubble (like final bot messages) */
+.chat-msg.bot .chat-typing {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    padding: 10px 12px !important;
+    border-radius: 10px !important;
+    background: rgba(255,255,255,0.06) !important;
+}
+.chat-msg.bot .chat-text { padding: 0; }
+
+/* Mobile contrast fixes: ensure chat text and placeholders are visible on small screens */
+@media (max-width: 700px) {
+    .chat-window {
+        /* slightly darker frosted background on phones for stronger contrast */
+        background: linear-gradient(180deg, rgba(6,10,18,0.82), rgba(6,10,18,0.6));
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .chat-messages { padding: 14px; }
+
+    /* Make all chat text white and ensure bubbles use darker backgrounds for contrast */
+    .chat-msg.bot {
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+    }
+
+    .chat-msg.user {
+        background: rgba(6,10,18,0.76);
+        color: #fff;
+    }
+
+    .chat-typing,
+    .chat-msg.bot .chat-typing {
+        background: rgba(255,255,255,0.04) !important;
+        color: #fff !important;
+    }
+
+    .chat-input {
+        background: rgba(255,255,255,0.06);
+        color: #fff;
+        border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .chat-input::placeholder { color: rgba(255,255,255,0.75); }
+
+    .chat-send { background: var(--brand-blue); color: #fff; }
+
+    /* Ensure chat window sits above mobile nav and gloss */
+    .chat-window { z-index: 1200; }
+}
+
+/* Mobile / Phone specific optimizations */
+@media (max-width:600px) {
+    /* make the hero adapt and be vertically stacked */
+    .hero { height: auto; padding-top: 56px; padding-bottom: 24px; align-items: flex-start }
+
+    /* index page: keep the home hero shorter on small phones and undo the
+       full-screen behaviour so it matches the first screenshot */
+    #hero.hero {
+        /* don’t cover the whole viewport – allow content to determine size */
+        height: auto;
+        min-height: 65vh; /* roughly two‑thirds of screen */
+        padding-top: 56px; /* same top padding so overlay still shows correctly */
+        padding-bottom: 24px;
+        align-items: center; /* centre contents vertically when possible */
+    }
+    /* reduce hero eyebrow and headline specifically for the main hero on phones */
+    #hero .eyebrow { font-size: 11px; letter-spacing: 2px; }
+    #hero .hero-title { font-size: 24px; line-height:1.06; margin: 8px 0; }
+    .hero-subtitle { font-size: 14px; }
+
+    /* stack CTA buttons and make them reasonable-sized touch targets on phones
+       (default behavior for widths <700px). For very narrow phones we later
+       revert to a row layout with smaller min-width so they sit side-by-side. */
+    .hero-cta { flex-direction: column; gap: 12px; padding: 0 12px; align-items: center }
+
+    /* make hero CTAs narrower on phones rather than full-bleed */
+    .hero-cta .btn, .hero-cta .btn-join, .hero-cta .btn-solid {
+        width: auto;                    /* shrink to content but remain capped */
+        min-width: 220px;
+        max-width: 92%;
+        padding: 10px 18px;
+        font-size: 15px;
+        border-radius: 999px; /* make hero CTAs fully pill-shaped */
+        box-sizing: border-box;
+    }
+
+    /* on very small phones, let the buttons sit side-by-side by reducing
+       their minimum width and switching to a row layout */
+    @media (max-width: 520px) {
+        .hero-cta { flex-direction: row; justify-content: center; }
+        .hero-cta .btn, .hero-cta .btn-join, .hero-cta .btn-solid {
+            min-width: 120px;
+            padding: 8px 14px;
+            font-size: 14px;
+        }
+    }
+
+     /* ensure the section itself is centered and the hero-cards container fills
+         the available width so its children can be centered reliably. Add
+         equal top/bottom padding to create larger breathing room around cards. */
+     #hero-cards-section {
+          display: flex;
+          justify-content: center;
+          align-items: center; /* vertically center the .hero-cards inside */
+         padding: 110px 0; /* larger equal space above and below the cards */
+     }
+
+    /* cards become full width and flow in the document; center on phones */
+    .hero-cards {
+        position: static;
+        transform: none !important; /* override older rules that used !important */
+        left: auto !important;
+        bottom: auto;
+        margin: 36px auto 0 !important;
+        gap: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100% !important;            /* fill section so centering works */
+        max-width: 560px;
+        padding: 0 12px;       /* consistent horizontal padding */
+        box-sizing: border-box;
+    }
+
+    /* make each card slightly narrower than the container so it appears centered */
+    .hero-cards .card { width: 92%; max-width: 480px; min-height: 380px; border-radius: 18px; margin: 0 auto }
+    .card-img { height: 300px } /* increased for better visual balance on phones */
+    .card-body { position: relative; z-index: 2; padding: 18px }
+    .card-btn { display: block; width: 100%; text-align: center }
+    /* ensure hero-card buttons fill their card and remain fully clickable */
+    .hero-cards .card-btn {
+        display: block;
+        width: 100%;                /* fill the card */
+        padding: 8px 12px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+    /* center text inside when button is narrower than the card work area */
+    .hero-cards .card-btn span { display:block; text-align:center; }
+
+/* Make hero-cards more square on narrow viewports: reduce tall min-heights
+   and use a responsive aspect ratio for the image so cards feel closer to
+   square on mobile devices. This only affects screens <=700px. */
+@media (max-width: 700px) {
+    .hero-cards .card {
+        /* remove the large desktop min-height so card height follows content
+           and image aspect ratio; keep width similar so layout remains centered */
+        min-height: 0 !important;
+        max-width: 560px;
+        width: 92%;
+        border-radius: 14px;
+        margin: 12px auto;
+        overflow: hidden;
+    }
+
+    .hero-cards .card .card-img {
+        /* create a fixed aspect ratio block for the image (approx square)
+           using padding-top so background-image keeps cover behavior */
+        display: block;
+        width: 100%;
+        height: 0;
+        padding-top: 75%; /* 4:3 -> closer to square; adjust to taste (70-80%) */
+        background-size: cover;
+        background-position: center;
+    }
+
+    .hero-cards .card-body {
+        padding: 14px;
+    }
+
+    .hero-cards .card-btn {
+        padding: 10px 12px;
+    }
+}
+
+
+    /* feature blocks on phones: stack vertically with content first
+       and show the illustrative image underneath the description */
+    .feature {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        align-items: stretch;
+    }
+    .feature-content { order: 1; text-align: center; padding: 0 8px }
+    .feature-img { display: block; order: 2 }
+    .feature-img img { width: 100%; max-height: 320px; object-fit: cover; border-radius: 12px; margin-top: 6px }
+    .feature-badge img { height: 48px }
+
+    /* video grid becomes single column */
+    .video-grid { grid-template-columns: 1fr; gap: 20px }
+
+    /* tighten container padding for phones */
+    .container { padding: 0 12px }
+
+    /* nav: allow wrapping and horizontal scroll to avoid overflow */
+    .main-nav>ul { gap: 12px; flex-wrap: wrap; overflow-x: auto; padding-bottom: 6px }
+    .main-nav>ul::-webkit-scrollbar { height: 6px }
+
+    /* Hide desktop nav on small screens; show via hamburger toggle */
+    .main-nav { display: none; }
+
+    /* Hamburger / nav toggle: use grid layout so the toggle sits
+       centered between logo/title and Give without fragile offsets */
+    .nav-wrap {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 6px; /* tighter gap so controls sit closer */
+    }
+
+    .nav-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        justify-self: center;
+        z-index: 300;
+        margin-left: 4px; /* nudge in from the right edge */
+    }
+    .nav-toggle button {
+        width: 36px;
+        height: 34px;
+        border-radius: 8px;
+        border: none;
+        background: rgba(255,255,255,0.06);
+        color: #fff;
+        display: inline-flex;
+        flex-direction: column; /* stack bars vertically */
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+    }
+
+    /* primary bar plus a pseudo-element to show the second dash */
+    .nav-toggle .bar {
+        display:block;
+        width:16px;
+        height:2px;
+        background:#fff;
+        border-radius:2px;
+        box-shadow:0 1px 0 rgba(0,0,0,0.2);
+        position: relative; /* anchor for the pseudo element */
+        transition: background 150ms ease, opacity 150ms ease, transform 150ms ease;
+    }
+
+    /* position the second dash explicitly so it doesn't overlap the first */
+    .nav-toggle .bar::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 8px; /* vertical gap between dashes */
+        width: 16px;
+        height: 2px;
+        background: #fff;
+        border-radius: 2px;
+        box-shadow: 0 1px 0 rgba(0,0,0,0.2);
+        transition: transform 180ms cubic-bezier(.2,.9,.2,1), top 150ms ease, opacity 150ms ease;
+        transform-origin: center;
+        opacity: 1;
+    }
+
+    /* create the top dash using ::before (hidden until open) */
+    .nav-toggle .bar::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: -8px; /* mirror above the main bar */
+        width: 16px;
+        height: 2px;
+        background: #fff;
+        border-radius: 2px;
+        box-shadow: 0 1px 0 rgba(0,0,0,0.2);
+        transform-origin: center;
+        transform: rotate(-45deg) scaleX(0.0);
+        opacity: 0;
+        transition: transform 180ms cubic-bezier(.2,.9,.2,1), opacity 150ms ease;
+    }
+
+    /* when menu is open, morph into X */
+    .nav-toggle button[aria-expanded="true"] .bar {
+        background: transparent; /* hide middle bar */
+    }
+    .nav-toggle button[aria-expanded="true"] .bar::after {
+        top: 0;
+        transform: rotate(45deg) scaleX(1);
+        opacity: 1;
+    }
+    .nav-toggle button[aria-expanded="true"] .bar::before {
+        transform: rotate(-45deg) scaleX(1);
+        opacity: 1;
+    }
+
+/* add a small downward arrow indicator on links that have a dropdown */
+.has-dropdown > a::after {
+    /* custom caret built with CSS borders to match provided image */
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 6px;
+    vertical-align: middle;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 6px solid currentColor;
+    opacity: 0.75;
+    transition: transform 150ms ease, opacity 150ms ease;
+}
+
+/* Utility: hide unwanted search inputs inserted by plugins or external widgets.
+   Matches inputs whose placeholder contains "Search" or are type=search. */
+input[placeholder*="Search"], input[type="search"] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Utility: hide any site search inputs if present (placeholder starts with or contains "Search")
+   This helps remove injected search widgets quickly across pages. */
+input[type="search"],
+input[placeholder^="Search"],
+input[placeholder*=" Search"],
+input[placeholder*="Search"] {
+    display: none !important;
+}
+
+/* New-here: improve readability on small screens by left-aligning long paragraphs
+   (keep footer and map text unaffected) */
+@media (max-width:700px) {
+    .page-new-here #what-to-expect p,
+    .page-new-here #what-to-expect .feature-content p,
+    .page-new-here .truth-body p,
+    .page-new-here .visit-section .visit-content p {
+        text-align: left !important;
+        line-height: 1.5;
+    }
+
+    /* Ensure footer and embedded map text keep site default styling */
+    .page-new-here footer p,
+    .page-new-here .map-card p {
+        color: inherit !important;
+        text-align: inherit !important;
+    }
+
+    /* Ensure unordered lists (weekly schedule) are left-aligned and bullets visible on mobile */
+    .page-new-here .feature-content ul,
+    .page-new-here .feature-content ul li,
+    .page-new-here #what-to-expect .feature-content ul,
+    .page-new-here #what-to-expect .feature-content ul li {
+        text-align: left !important;
+        list-style-position: outside !important;
+    }
+
+    .page-new-here .feature-content ul { padding-left: 18px; margin-left: 0; }
+}
+
+/* flipped/visible state when dropdown is open */
+.has-dropdown.dropdown-open > a::after {
+    opacity: 1;
+    transform: rotate(180deg); /* point upwards when open */
+}
+
+/* when a dropdown is explicitly opened via JS, show it */
+.has-dropdown.dropdown-open .dropdown {
+    display: block !important;
+}
+
+
+    /* Place Give into the right-most grid column on mobile */
+    .nav-wrap .btn-give {
+        position: relative;
+        justify-self: center; /* center column */
+        z-index: 300;
+        margin-right: 2px; /* small inward nudge */
+        padding: 6px 10px; /* compact touch target on mobile */
+    }
+
+    /* On phones hide the header Give and show it inside the mobile menu */
+    .nav-wrap .btn-give { display: none }
+    .main-nav .nav-give { margin-top: 6px }
+    .main-nav .mobile-nav-give {
+        display: block;
+        background: var(--brand-blue);
+        color: #fff;
+        padding: 10px 12px;
+        border-radius: 8px;
+        font-weight: 700;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    /* Swap positions: put Give in the center column and the toggle on the right */
+    .nav-wrap .logo { grid-column: 1; }
+    .nav-wrap .main-nav { display: none; }
+    .nav-wrap .btn-give { grid-column: 2; }
+    .nav-wrap .nav-toggle { grid-column: 3; justify-self: end; }
+
+    /* forms and inputs scale to full width */
+    .location-card .postcode-row input { width: 100%; box-sizing: border-box }
+
+    /* reduce map height for small screens */
+    .map-card iframe { height: 220px }
+
+    /* chatbot should be touch-friendly and full-width near the bottom */
+    .chat-window { right: 12px; left: auto; width: auto; bottom: 84px; height: 360px }
+
+    /* back to top & chat toggle move slightly inward */
+    .back-to-top { right: 12px; bottom: 16px }
+    .chat-toggle { right: 12px; left: auto; bottom: 16px }
+
+    /* Reduce vertical spacing between major sections on phones */
+    .section { padding: 40px 0; }
+
+    /* About section: significantly smaller top padding on phones so content
+       follows the previous section more closely. This replaces the large
+       desktop-only top padding used to clear the hero. */
+    #about { padding-top: 72px; }
+
+    /* Ensure ministries grid stacks cleanly on small phones (override page-local styles) */
+    .ministries-body .ministries-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+        max-width: 100% !important;
+    }
+    .ministries-body .ministries-grid .min-card,
+    .ministries-body .ministries-grid .min-card.big {
+        grid-column: auto !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+}
+
+@media (max-width:420px) {
+    /* more compact hero title; keep hero cards visible on very small phones
+       and simplify their layout so descriptions and buttons remain accessible */
+    #hero .eyebrow { font-size: 10px; letter-spacing: 1.6px }
+    /* reduced hero headline for better fit on smaller phones */
+    #hero .hero-title { font-size: 16px; line-height: 1.03 }
+    /* also reduce page hero headings on phone-sized screens */
+    .page-hero .hero-title { font-size: 28px }
+
+    /* slightly smaller hero CTAs for very-small phones */
+    .hero-cta .btn, .hero-cta .btn-join, .hero-cta .btn-solid {
+        min-width: 180px;
+        padding: 9px 14px;
+        font-size: 14px;
+        border-radius: 999px; /* pill-shaped on very-small phones */
+    }
+
+    .hero-cards {
+        display: grid;
+        gap: 12px;
+        margin-top: 10px;
+        position: static;
+        transform: none;
+        width: 100%;
+        justify-items: center;
+    }
+    .hero-cards .card { width: 92%; min-height: auto; border-radius: 14px; margin: 0 auto }
+    .card-img { height: 200px } /* increased for very-small phones */
+    .card-body { position: static; padding: 10px }
+    .card-body h3 { font-size: 18px; margin-bottom: 6px }
+    .card-body p { display: block; color: rgba(255,255,255,0.96); margin: 4px 0 10px; font-size: 13px; line-height:1.25 }
+    .card-body { color: #fff; text-shadow: 0 6px 18px rgba(0,0,0,0.6) }
+    .card-btn { display: block; width: 100%; text-align: center }
+    .chat-window { height: 320px }
+    .video-title { font-size: 22px }
+}
+
+@media (max-width:360px) {
+    /* very-small phones — reduce main hero eyebrow and headline so it fits comfortably */
+    #hero .eyebrow { font-size: 9px; letter-spacing: 1.2px }
+    /* slightly smaller still for the smallest screens */
+    #hero .hero-title { font-size: 14px; line-height: 1.02; margin: 6px 0 }
+    .page-hero .hero-title { font-size: 22px }
+}
+
+/* Remove white underline / sweep from Give button in mobile menu */
+@media (max-width: 700px) {
+    .nav-wrap .btn-give,
+    .main-nav .mobile-nav-give {
+        background: var(--brand-blue) !important;
+        color: #fff !important;
+        border: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+        text-decoration: none !important;
+    }
+
+    /* hide any sweep/overlay pseudo elements that could draw a white line */
+    .nav-wrap .btn-give::before,
+    .nav-wrap .btn-give::after,
+    .main-nav .mobile-nav-give::before,
+    .main-nav .mobile-nav-give::after {
+        display: none !important;
+        content: none !important;
+    }
+
+    /* ensure no bottom border appears */
+    .nav-wrap .btn-give,
+    .main-nav .mobile-nav-give {
+        border-bottom: 0 !important;
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+        background-image: none !important;
+        background-clip: padding-box !important;
+    }
+}
+
+/* Also remove any underline/sweep for Location and Contact links inside the mobile menu */
+@media (max-width: 700px) {
+    .main-nav a[href$="location.html"],
+    .main-nav a[href$="contact.html"],
+    .main-nav .dropdown a[href$="location.html"],
+    .main-nav .dropdown a[href$="contact.html"] {
+        text-decoration: none !important;
+        border-bottom: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        color: #fff !important;
+    }
+
+    .main-nav a[href$="location.html"]::before,
+    .main-nav a[href$="location.html"]::after,
+    .main-nav a[href$="contact.html"]::before,
+    .main-nav a[href$="contact.html"]::after,
+    .main-nav .dropdown a[href$="location.html"]::before,
+    .main-nav .dropdown a[href$="location.html"]::after,
+    .main-nav .dropdown a[href$="contact.html"]::before,
+    .main-nav .dropdown a[href$="contact.html"]::after {
+        display: none !important;
+        content: none !important;
+    }
+}
+
+/* Center hero overlay text vertically and horizontally on phones */
+@media (max-width:600px) {
+    .page-hero {
+        /* allow the hero to shrink so content centers naturally */
+        height: auto;
+        min-height: 360px;
+    }
+
+    .page-hero .hero-overlay {
+        display: flex;
+        align-items: center; /* vertical center */
+        justify-content: center; /* horizontal center */
+        padding-top: 0;
+        padding-bottom: 0;
+        text-align: center;
+    }
+
+    /* ensure the inner container fills the overlay and centers its contents */
+    .page-hero .hero-overlay .container {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px 12px;
+        max-width: 92%;
+        margin: 0 auto;
+        /* move the centered block slightly lower within the hero */
+        transform: translateY(12%);
+        -webkit-transform: translateY(12%);
+    }
+
+    /* slightly reduced sizes for a better fit on phones */
+    .page-hero .hero-title { font-size: 28px; line-height: 1.06 }
+    .page-hero .hero-subtitle { font-size: 14px }
+}
+
+/* Make the offset a bit smaller on very small devices */
+@media (max-width:360px) {
+    .page-hero .hero-overlay .container { transform: translateY(8%); -webkit-transform: translateY(8%); }
+}
+
+/* Ensure featured ministries images fill their cards on small screens */
+@media (max-width:600px) {
+    #featured-ministries .card { min-height: 260px; }
+    #featured-ministries .card-img { height: 100% !important; }
+    #featured-ministries .card-body { position: absolute; left:0; right:0; bottom:0; }
+}
+
+/* Mobile open state: show nav as an overlay menu */
+body.mobile-nav-open .main-nav {
+    /* Full-screen slide-over sheet for mobile menu */
+    display: block;
+    position: fixed;
+    inset: 0; /* top:0; right:0; bottom:0; left:0 */
+    width: 100%;
+    height: 100vh;
+    /* stronger backdrop for readability */
+    background: rgba(6,10,18,0.96);
+    backdrop-filter: blur(6px);
+    padding: 22px 18px;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    z-index: 9999;
+    overflow-y: auto;
+}
+
+/* Stack and enlarge mobile nav links for easy tapping */
+body.mobile-nav-open .main-nav>ul { display:block; flex-direction:column; gap:18px; margin-top: 56px }
+body.mobile-nav-open .main-nav a { display:block; padding:14px 12px; font-size:18px; color:#fff; }
+body.mobile-nav-open .main-nav .dropdown { position: static; background: transparent; box-shadow: none; padding: 0; margin-top: 0 }
+body.mobile-nav-open .has-dropdown .dropdown { display:block }
+
+/* mobile close (X) button inside the sheet */
+.mobile-nav-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    font-size: 20px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10010;
+}
+.mobile-nav-close:focus { outline: 2px solid rgba(255,255,255,0.12); }
+
+/* Only show the in-menu close button on small screens (hide on desktop) */
+.mobile-nav-close { display: none !important; }
+@media (max-width: 700px) {
+    body.mobile-nav-open .mobile-nav-close { display: inline-flex !important; }
+}
+/* Mobile dropdown animation: animate list items when mobile menu opens */
+@keyframes mobile-dropdown-swipe {
+    0% { opacity: 0; transform: translateY(-10px); }
+    60% { opacity: 1; transform: translateY(4px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+body.mobile-nav-open .main-nav .dropdown li {
+    opacity: 0; /* start hidden so animation runs */
+    transform: translateY(-6px);
+    will-change: transform, opacity;
+    pointer-events: none;
+}
+
+/* Trigger the swipe animation for each item with small stagger on open */
+body.mobile-nav-open .main-nav .dropdown li {
+    animation-name: mobile-dropdown-swipe;
+    animation-duration: 380ms;
+    animation-timing-function: cubic-bezier(.08,.82,.165,1);
+    animation-fill-mode: both;
+}
+
+body.mobile-nav-open .main-nav .dropdown li:nth-child(1) { animation-delay: 0ms }
+body.mobile-nav-open .main-nav .dropdown li:nth-child(2) { animation-delay: 60ms }
+body.mobile-nav-open .main-nav .dropdown li:nth-child(3) { animation-delay: 120ms }
+body.mobile-nav-open .main-nav .dropdown li:nth-child(4) { animation-delay: 180ms }
+body.mobile-nav-open .main-nav .dropdown li:nth-child(5) { animation-delay: 240ms }
+body.mobile-nav-open .main-nav .dropdown li:nth-child(6) { animation-delay: 300ms }
+
+/* Ensure links become interactable after animation */
+body.mobile-nav-open .main-nav .dropdown li { pointer-events: auto }
+
+/* Animate top-level nav items when hamburger (mobile menu) opens */
+@keyframes mobile-nav-item-swipe {
+    0% { opacity: 0; transform: translateY(-8px); }
+    60% { opacity: 1; transform: translateY(4px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+body.mobile-nav-open .main-nav>ul>li {
+    opacity: 0;
+    transform: translateY(-6px);
+    will-change: transform, opacity;
+    animation-name: mobile-nav-item-swipe;
+    animation-duration: 360ms;
+    animation-timing-function: cubic-bezier(.08,.82,.165,1);
+    animation-fill-mode: both;
+}
+
+body.mobile-nav-open .main-nav>ul>li:nth-child(1) { animation-delay: 0ms }
+body.mobile-nav-open .main-nav>ul>li:nth-child(2) { animation-delay: 50ms }
+body.mobile-nav-open .main-nav>ul>li:nth-child(3) { animation-delay: 100ms }
+body.mobile-nav-open .main-nav>ul>li:nth-child(4) { animation-delay: 150ms }
+body.mobile-nav-open .main-nav>ul>li:nth-child(5) { animation-delay: 200ms }
+body.mobile-nav-open .main-nav>ul>li:nth-child(6) { animation-delay: 250ms }
+
+body.mobile-nav-open .main-nav>ul { display:block; flex-direction:column; gap:8px }
+body.mobile-nav-open .main-nav a { display:block; padding:10px 8px }
+body.mobile-nav-open .main-nav .dropdown { position: static; background: transparent; box-shadow: none; padding: 0; margin-top: 0 }
+body.mobile-nav-open .has-dropdown .dropdown { display:block }
+
+/* Message wall (sliding text) */
+/* full-bleed marquee that stretches to the viewport edges */
+.marquee { 
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    width: 100vw;
+    overflow: hidden;
+    background: #0b2238; /* solid behind the text to read against */
+    /* slightly reduced vertical padding to avoid showing native scrollbars */
+    padding: 20px 0;
+}
+
+.marquee::before,
+.marquee::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 10%;
+    pointer-events: none;
+    z-index: 2;
+}
+.overseer-slide .profile-img img { width: 100%; border-radius: 12px; display:block }
+
+.profile-content .social-links a { display:inline-flex; align-items:center; gap:8px; color: #b48bd6 }
+.profile-content .social-links svg { width:18px; height:18px; display:block; fill: currentColor }
+.marquee::after { right: 0; background: linear-gradient(270deg, #0b2238 0%, rgba(11,34,56,0) 60%); }
+
+.marquee-track { display: flex; gap: 64px; align-items: center; will-change: transform; --marquee-duration: 28s; animation: marquee var(--marquee-duration) linear infinite; }
+.marquee-group { display: flex; gap: 64px; align-items: center; }
+.marquee-item { color: #ffffff; font-weight: 900; font-size: 14px; white-space: nowrap; padding: 0 20px; 
+    /* improve legibility on light image backgrounds: stronger weight + dark shadow and light stroke */
+    background: transparent;
+    border-radius: 0;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    -webkit-text-stroke: 0.28px rgba(0,0,0,0.45);
+}
+
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* Hover to pause animation for accessibility */
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track { animation-play-state: paused; }
+
+@media (max-width:600px) {
+    .marquee-item { font-size: 13px; font-weight:900; padding: 0 12px; text-shadow: 0 1.6px 4px rgba(0,0,0,0.55); -webkit-text-stroke: 0.22px rgba(0,0,0,0.45); }
+    .marquee-track { gap: 28px; --marquee-duration: 18s; }
+}
+
+@media (min-width:1200px) {
+    /* larger on wide screens, increase weight + shadow for readability */
+    .marquee-item { font-size: 22px; padding: 0 24px; font-weight: 900; text-shadow: 0 3px 8px rgba(0,0,0,0.6); -webkit-text-stroke: 0.32px rgba(0,0,0,0.45); }
+    .marquee-track { gap: 84px; }
+}
+
+/* Quick reply buttons inside chat */
+.chat-quick-replies { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap }
+.chat-quick-reply { background: rgba(255,255,255,0.08); color:#fff; border:none; padding:6px 8px; border-radius:12px; cursor:pointer; font-size:13px }
+.chat-quick-reply:hover { background: rgba(255,255,255,0.12) }
+
+.chat-text { white-space:pre-wrap }
+
+/* ------------------------------------------------------------------ */
+/* Meet Our Pastors — two-column layout placed after the main hero    */
+/* ------------------------------------------------------------------ */
+.meet-leaders {
+    padding: 80px 0;
+}
+
+/* Flip-card styles for values grid */
+.values-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:28px; align-items:stretch }
+.value-card { perspective: 1200px; cursor: pointer; height: 100%; }
+.value-card .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 700ms cubic-bezier(.2,.9,.3,1);
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    will-change: transform;
+}
+.value-card .card-front,
+.value-card .card-back {
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    overflow: hidden;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.value-card .card-front { z-index: 2; }
+.value-card .card-front img { width:100%; height: 260px; object-fit: cover; display:block }
+.value-card .card-front figcaption { background: rgba(4,10,18,0.6); color:#fff; padding:12px; text-align:center; font-weight:700 }
+.value-card .card-back {
+    /* ensure the back-face is rotated and sits behind the front until flipped */
+    background: linear-gradient(180deg, rgba(3,17,28,0.96), rgba(6,22,36,0.96));
+    color: #fff;
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
+    z-index: 1;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+    text-align: center;
+}
+.value-card .card-back blockquote { margin:0; font-size:15px; line-height:1.35 }
+.value-card .card-back cite { display:block; margin-top:8px; font-size:13px; opacity:0.85 }
+.value-card.is-flipped .card-inner { transform: rotateY(180deg); -webkit-transform: rotateY(180deg); }
+/* Flip on hover or keyboard focus instead of click */
+.value-card:hover .card-inner,
+.value-card:focus .card-inner,
+.value-card:focus-within .card-inner {
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
+}
+.value-card:focus { outline: 3px solid rgba(30,115,255,0.12); outline-offset: 6px }
+
+@media (max-width:900px) {
+    .values-grid { grid-template-columns: 1fr; }
+    /* ensure the image fills the card height on phones */
+    .value-card .card-front img { height: 100% !important; }
+}
+
+@media (min-width:1300px) {
+    .values-grid { grid-template-columns: repeat(3, 1fr); gap:36px }
+    .value-card .card-front img { height: 320px }
+}
+
+/* Our History section: large logo on right, black text on left, no background on logo */
+.history-section { padding: 72px 0; background: transparent; color: #111 }
+.history-grid { display: grid; grid-template-columns: 1fr 520px; gap: 48px; align-items: center }
+.history-title { font-size: 96px; line-height: 0.95; margin: 0 0 18px; font-weight: 900; color: #111 }
+.history-body { color: #111; font-size: 15px; line-height: 1.6 }
+.history-body p { margin-bottom: 12px }
+.history-logo { display:flex; align-items:center; justify-content:center }
+.history-logo-img { max-width:100%; width:420px; height:auto; display:block; background: transparent; border-radius: 0 }
+
+@media (max-width:1100px) {
+    .history-grid { grid-template-columns: 1fr; gap: 22px }
+    .history-title { font-size: 48px }
+    .history-logo-img { width: 260px }
+}
+
+@media (max-width:600px) {
+    .history-title { font-size: 36px }
+    .history-logo-img { width: 200px }
+    /* on phones: keep the title centered but left-align long paragraphs for readability */
+    .history-section { text-align: center; }
+    .history-body { margin: 0 auto; max-width: 90%; text-align: left; }
+
+/* 3D rotatable logo styles */
+.history-logo-3d { perspective: 1200px; display:flex; align-items:center; justify-content:center; position:relative }
+.history-logo-inner { transform-style: preserve-3d; transition: transform 120ms linear; will-change: transform; display:inline-block; cursor:grab;
+    /* prevent touch-driven scrolling so pointermove events always fire */
+    touch-action: none;
+    -ms-touch-action: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+.history-logo-inner:active { cursor:grabbing }
+.history-logo-img { backface-visibility: hidden; transform: translateZ(40px) rotateX(0deg) rotateY(0deg); transition: box-shadow 160ms ease; border-radius:14px; }
+.history-logo-3d:focus { outline: 3px solid rgba(127,211,255,0.12); outline-offset: 8px }
+
+/* subtle specular highlight */
+.history-logo-3d::after { content: ""; position: absolute; pointer-events: none; width: 80%; height: 80%; border-radius: 14px; mix-blend-mode: overlay; background: radial-gradient(600px 300px at 20% 10%, rgba(255,255,255,0.18), rgba(255,255,255,0.04) 6%, rgba(255,255,255,0) 30%); opacity: 0.85; transform: translateZ(60px); }
+
+/* Responsive size tweaks for the 3D wrapper */
+@media (max-width: 900px) {
+    .history-logo-img { width: 260px }
+}
+
+@media (max-width: 560px) {
+    .history-logo-img { width: 200px }
+}
+}
+
+.leaders-grid {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 48px;
+    align-items: center;
+}
+
+.leader-intro .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--dark);
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.kicker .kicker-logo {
+    width: 84px;
+    height: 84px;
+    display: block;
+    object-fit: contain;
+    border-radius: 0;
+    background: transparent;
+    padding: 0;
+}
+
+@media (max-width: 900px) {
+    .kicker .kicker-logo {
+        width: 48px;
+        height: 48px;
+    }
+}
+
+/* Mobile: stack leaders section, place image (and its caption) above the intro,
+   and center the intro content for better readability on phones */
+@media (max-width: 700px) {
+    .leaders-grid {
+        display: block;
+    }
+
+    /* ensure the photo carousel sits above the intro and is centered */
+    .leader-photo {
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 auto 18px auto;
+        width: 100%;
+        max-width: 420px;
+    }
+
+    /* make the carousel itself responsive and centered */
+    #meet-leaders .feature-carousel {
+        margin: 0 auto 12px auto;
+        width: 92%;
+        max-width: 420px;
+    }
+
+    /* caption (name) should appear below the image and be centered */
+    .leader-photo .carousel-caption {
+        display: block;
+        text-align: center;
+        margin-top: 10px;
+        color: #062246;
+        font-weight: 700;
+    }
+
+    /* center the intro heading and paragraph on phones and improve spacing */
+    .leader-intro {
+        text-align: center;
+        padding: 0 12px;
+        margin-top: 6px;
+    }
+
+    .leader-intro .lead-title {
+        font-size: 26px;
+        line-height: 1.15;
+        margin-bottom: 10px;
+    }
+
+    /* Keep long paragraphs left-aligned for readability on mobile */
+    .leader-intro .lead-copy {
+        font-size: 15px;
+        line-height: 1.6;
+        max-width: 680px;
+        margin: 0 auto;
+        color: #000; /* black text on mobile for readability */
+        text-align: left;
+    }
+
+    /* ensure short headings/captions remain centered */
+    .leader-photo .carousel-caption,
+    .leader-intro .lead-title {
+        text-align: center;
+    }
+}
+
+.lead-title {
+    font-size: 48px;
+    color: var(--dark);
+    margin: 0 0 14px 0;
+    font-weight: 900;
+    line-height: 1.02;
+}
+
+.lead-copy {
+    color: #222;
+    font-size: 16px;
+    max-width: 64ch;
+    margin: 0;
+}
+
+.leader-photo img {
+    width: 100%;
+    height: 100%;
+    max-height: 560px;
+    object-fit: cover;
+    border-radius: 22px;
+    box-shadow: 0 18px 36px rgba(6, 10, 18, 0.18);
+    display: block;
+}
+
+@media (max-width: 1000px) {
+    .leaders-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+    .leader-photo {
+        order: -1;
+    }
+    .lead-title {
+        font-size: 34px;
+    }
+    .meet-leaders {
+        padding: 48px 0;
+    }
+}
+
+/* center the intro text on phones for better appearance */
+@media (max-width: 600px) {
+    .leader-intro { text-align: center; }
+    .leader-intro .kicker { justify-content: center; }
+    .lead-copy { margin: 0 auto; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Our Values — dark blue section with four image cards                */
+/* ------------------------------------------------------------------ */
+.values-section {
+    background: linear-gradient(180deg, #081c33 0%, #071826 100%);
+    color: #fff;
+    padding: 86px 0 120px;
+    position: relative;
+    overflow: hidden;
+}
+
+.values-head {
+    text-align: center;
+    margin-bottom: 36px;
+}
+
+.values-title {
+    font-size: 44px;
+    font-weight: 900;
+    margin: 8px 0 6px;
+    color: #fff;
+}
+
+.values-title .accent {
+    color: #79cfc7;
+}
+
+/* Make the kicker in the values header a white badge with the RCCG logo */
+.values-head .kicker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.values-head .kicker .kicker-logo {
+    width: 36px;
+    height: 36px;
+    display: inline-block;
+    object-fit: contain;
+    padding: 0;
+    background: transparent;
+    border-radius: 50%;
+    /* clip the image to a circle so any square/rounded white backdrop is hidden */
+    -webkit-clip-path: circle(50% at 50% 50%);
+    clip-path: circle(50% at 50% 50%);
+    overflow: hidden;
+}
+
+/* Larger, centered heading with an accent-sw ash under the word 'Values' */
+.values-head { text-align: center }
+.values-title { font-size: 56px; line-height: 1.02; margin-top: 6px }
+.values-title .accent {
+    color: #79cfc7;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 10px;
+}
+
+.values-title .accent::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: -8px;
+    bottom: -10px;
+    height: 28px;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: 120% auto;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 40'><path d='M5 20 C60 5 120 35 300 18' stroke='%2379cfc7' stroke-width='10' stroke-linecap='round' fill='none' opacity='0.98'/></svg>");
+    z-index: -1;
+}
+
+.values-section .divider { width: 64px; height: 4px; background: #fff; margin: 12px auto; border-radius: 2px }
+
+@media (max-width: 1000px) {
+    .values-title { font-size: 44px }
+    .values-title .accent::after { bottom: -8px; height: 22px }
+    .values-head .kicker .kicker-logo { width: 32px; height: 32px; padding: 5px }
+}
+
+@media (max-width: 700px) {
+    .values-title { font-size: 34px }
+    .values-title .accent::after { bottom: -6px; height: 16px }
+}
+
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px; /* tightened spacing between cards */
+    align-items: start;
+}
+
+.value-card {
+    background: rgba(255,255,255,0.02);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 16px 40px rgba(2,8,20,0.45);
+    display: flex;
+    flex-direction: column;
+    aspect-ratio: 1 / 1; /* keep cards perfectly square */
+}
+
+.value-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.value-card figcaption {
+    padding: 12px 14px;
+    text-align: center;
+    font-weight: 800;
+    color: #fff;
+    background: rgba(0,0,0,0.12);
+}
+
+@media (max-width: 1200px) {
+    .values-grid { grid-template-columns: repeat(2, 1fr); gap: 14px }
+}
+
+@media (max-width: 700px) {
+    .values-grid { grid-template-columns: 1fr; gap: 12px }
+    .values-title { font-size: 32px }
+    .values-section { padding: 48px 0 }
+}
+
+/* On very wide viewports, show 3 larger square cards so each box increases in size */
+@media (min-width: 1300px) {
+    .values-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+}
+
+/* Mobile-specific: reduce the value-card size and center the grid for phones */
+@media (max-width: 700px) {
+    .values-grid {
+        grid-template-columns: 1fr;
+        justify-items: center; /* center each card horizontally */
+        justify-content: center;
+        gap: 12px;
+        max-width: 420px;
+        margin: 0 auto;
+        padding: 0 12px;
+    }
+
+    .value-card {
+        width: 92%;
+        max-width: 360px;
+        aspect-ratio: 4 / 3; /* slightly wider than tall on phones */
+        border-radius: 14px;
+        box-shadow: 0 12px 30px rgba(2,8,20,0.38);
+        overflow: hidden;
+    }
+
+    .value-card .card-front {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .value-card .card-front img {
+        width: 100%;
+        height: 100%;
+        flex: 1 1 auto;
+        object-fit: cover;
+        border-radius: 14px 14px 0 0;
+        display: block;
+    }
+
+    .value-card .card-front figcaption {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .value-card .card-back blockquote {
+        font-size: 14px;
+        line-height: 1.35;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 420px) {
+    .values-grid {
+        max-width: 360px;
+        gap: 10px;
+    }
+
+    .value-card {
+        max-width: 320px;
+        aspect-ratio: 1 / 1; /* square on smallest phones */
+    }
+
+    /* keep image filling the card height on very small phones */
+    .value-card .card-front img {
+        height: 100%;
+        flex: 1 1 auto;
+        object-fit: cover;
+    }
+}
+
+/* --- Core Essential Truths (accordion) --- */
+.truths-section {
+    /* darker navy gradient to match example */
+    background: linear-gradient(180deg, #071726 0%, #071a2a 60%, #071726 100%);
+    background-color: #071726;
+    color: #fff;
+    padding: 72px 0;
+}
+.truths-section .container { max-width: 1100px }
+.truths-head .kicker .kicker-logo { width: 34px; height: 34px }
+.truths-title { color: #fff; font-weight:900 }
+
+.truths-logo-wrapper { display:flex; justify-content:center; align-items:center; margin-bottom:10px }
+.truths-logo-img { width: 120px; height: auto; display: block; border-radius: 18px; background: transparent }
+.truths-kicker { color: rgba(255,255,255,0.92); letter-spacing: 2px; font-weight:700; margin-bottom:8px }
+
+.truths-accordion { display: grid; gap: 16px; margin-top: 24px }
+
+.truth-item {
+    background: transparent;
+    border-radius: 14px;
+}
+
+.truth-item summary {
+    list-style: none;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px;
+    background: #ffffff; /* changed from var(--accent) to white */
+    color: var(--dark);
+    border-radius: 12px;
+    font-weight: 800;
+    box-shadow: 0 10px 30px rgba(2,8,20,0.35);
+}
+
+.truth-item summary .truth-number { margin-right: 14px; color: var(--dark); font-weight:900 }
+.truth-item summary .truth-label { flex: 1 }
+
+.truth-item .chev { transition: transform 220ms ease; margin-left: 12px; flex-shrink:0 }
+.truth-item[open] summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0 }
+.truth-item[open] .chev { transform: rotate(180deg) }
+
+.truth-body {
+    padding: 16px 20px 20px 20px;
+    background: #fff;
+    color: var(--dark);
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 8px 20px rgba(2,8,20,0.18);
+}
+
+@media (max-width: 900px) {
+    .truths-title { font-size: 32px }
+    .truth-item summary { padding: 14px 16px }
+    .truth-body { padding: 12px 16px }
+    .truths-logo-img { width: 80px }
+}
+
+/* Make the Latest Message section match the darker navy aesthetic */
+#latest-message {
+    background: linear-gradient(180deg, #071726 0%, #071a2a 60%, #071726 100%);
+    background-color: #071726;
+    color: #fff;
+}
+
+#latest-message .video-info .eyebrow { color: rgba(255,255,255,0.86); }
+#latest-message .video-info .eyebrow .eyebrow-badge { filter: none }
+#latest-message .video-title { color: #fff; }
+#latest-message .video-title .video-em { color: #79cfc7; }
+#latest-message .video-desc { color: rgba(255,255,255,0.86); }
+#latest-message .divider { background: rgba(255,255,255,0.12) }
+
+#latest-message .video-card img {
+    border-radius: 12px;
+    box-shadow: 0 18px 48px rgba(2,8,20,0.55);
+}
+
+@media (max-width: 900px) {
+    #latest-message .video-card img { box-shadow: 0 10px 28px rgba(2,8,20,0.45) }
+}
+
+/* Find Us / Location: dark navy to match other sections */
+#find-us {
+    background: linear-gradient(180deg, #071726 0%, #071a2a 60%, #071726 100%);
+    background-color: #071726;
+    color: #fff;
+}
+
+#find-us .location-card h3,
+#find-us .location-card h4,
+#find-us .location-card p,
+#find-us label {
+    color: rgba(255,255,255,0.92);
+}
+
+#find-us .postcode-row input,
+#find-us #postcode {
+    width: 100%;
+    max-width: 680px;
+    padding: 14px 18px;
+    border-radius: 999px;
+    border: none;
+    background: #fff;
+    color: #071726;
+    box-shadow: 0 10px 30px rgba(2,8,20,0.45);
+    font-weight: 600;
+}
+
+#find-us .get-in-touch,
+#find-us .btn.btn-dark,
+#find-us .btn-dark {
+    background: #fff;
+    color: #071726;
+    border-radius: 999px;
+    padding: 10px 22px;
+    border: none;
+    box-shadow: 0 12px 28px rgba(2,8,20,0.35);
+}
+
+#find-us .map-card iframe {
+    border-radius: 12px;
+    box-shadow: 0 18px 48px rgba(2,8,20,0.5);
+    border: none;
+}
+
+@media (max-width: 900px) {
+    #find-us { padding: 48px 0 }
+    #find-us .postcode-row input { max-width: 100% }
+}
+
+
+/* Make only the 'RCCG Solution Ground' emphasized text dark blue and the preceding text light blue */
+#stay-connected .stay-em { color: #071726; }
+#stay-connected .text-light-blue { color: #7fd3ff; }
+
+
+/* -- Visit / Weekend promo section -- */
+.visit-section {
+    background: linear-gradient(180deg, #0f1112 0%, #0b0c0d 100%);
+    padding: 72px 0;
+}
+.visit-grid {
+    display: flex;
+    gap: 36px;
+    align-items: center;
+    justify-content: space-between;
+}
+.visit-content {
+    flex: 1 1 56%;
+    max-width: 720px;
+}
+.visit-content .eyebrow { color: rgba(255,255,255,0.85); }
+.visit-section .section-title { color: #fff; font-size: 36px; margin: 6px 0 8px 0; }
+.visit-section p { color: rgba(255,255,255,0.85); font-weight:600 }
+.visit-buttons { margin-top: 18px; display: flex; gap: 12px; flex-wrap: wrap }
+.visit-img { flex: 0 0 420px; display: flex; justify-content: flex-end }
+.visit-img img { width: 100%; max-width: 420px; height: auto; border-radius: 18px; display: block; box-shadow: 0 12px 40px rgba(0,0,0,0.6); object-fit: cover }
+
+@media (max-width: 900px) {
+    .visit-grid { flex-direction: column-reverse; text-align: center }
+    .visit-img { width: 100%; max-width: 420px; justify-content: center }
+    .visit-content { max-width: 100% }
+    .visit-buttons { justify-content: center }
+    .visit-section { padding: 48px 0 }
+}
+
+#evangelism-location {
+    /* match the Find Us blue gradient for visual consistency */
+    background: linear-gradient(180deg, #062246 0%, #0b3a66 100%);
+    color: #fff;
+    padding: 120px 0;
+}
+
+#evangelism-location .location-card h3,
+#evangelism-location .location-card h4,
+#evangelism-location .location-card p,
+#evangelism-location label {
+    color: rgba(255,255,255,0.92);
+}
+
+#evangelism-location .postcode-row input,
+#evangelism-location #ev-postcode {
+    width: 100%;
+    max-width: 680px;
+    padding: 14px 18px;
+    border-radius: 999px;
+    border: none;
+    background: #fff;
+    color: #071726;
+    box-shadow: 0 10px 30px rgba(2,8,20,0.45);
+    font-weight: 600;
+}
+
+#evangelism-location .btn.btn-dark,
+#evangelism-location .get-in-touch {
+    background: #fff;
+    color: #071726;
+    border-radius: 999px;
+    padding: 10px 22px;
+    border: none;
+    box-shadow: 0 12px 28px rgba(2,8,20,0.35);
+}
+
+/* ===== Youth gallery & sliders (page-specific) ===== */
+.youth-gallery-section { padding: 56px 0; background: #fff; color: #071726; }
+.youth-gallery-section .section-title { color: #071726; font-size: 34px; margin-bottom: 6px }
+.youth-gallery-section .lead { color: rgba(7,23,38,0.9); font-weight:400 }
+
+/* Heading logo + split title colors */
+.youth-intro .intro-logo { height: 36px; width: auto; vertical-align: middle; margin-right: 12px; display: inline-block }
+.youth-intro .section-title { display: flex; align-items: center; gap: 10px; font-size: 34px }
+.youth-intro .section-title .title-youth { color: var(--brand-blue); margin-right: 6px }
+.youth-intro .section-title .title-rest { color: #7fd3ff }
+.youth-gallery-section .decor-lines { margin-top: 10px; text-align: left }
+.youth-gallery-section .decor-lines span { display:inline-block; height:6px; width:88px; background:var(--brand-blue); margin: 0 8px; border-radius:3px }
+
+.youth-gallery { display: flex; gap: 24px; align-items: flex-start; margin-top: 22px }
+.youth-gallery.simple { align-items: stretch }
+.youth-gallery.simple .big-slider { flex: 1 1 auto; min-height: 640px; position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 18px 48px rgba(2,8,20,0.06); }
+.youth-gallery.simple .tall-slider { width: 340px; min-height: 540px; border-radius: 12px; overflow: hidden; position: relative; box-shadow: 0 12px 36px rgba(2,8,20,0.06) }
+
+/* Generic slider internals (scoped to this page) */
+.slider { position: relative; background: #f2f4f6 }
+.slider .slides { position: relative; height: 100% }
+.slider .slides .slide { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity .6s ease; }
+.slider .slides .slide.active { opacity: 1 }
+
+.big-slider .slide-caption { position: absolute; left: 16px; bottom: 16px; background: rgba(6,10,18,0.72); color: #fff; padding: 8px 12px; border-radius: 10px; font-weight:700; z-index: 6 }
+
+.slide-prev, .slide-next { position: absolute; top: 50%; transform: translateY(-50%); border: none; background: rgba(0,0,0,0.4); color: #fff; width: 44px; height: 44px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; z-index: 8 }
+.slide-prev { left: 12px }
+.slide-next { right: 12px }
+.slide-prev:hover, .slide-next:hover { transform: translateY(-50%) scale(1.03) }
+
+/* ensure text in this section overrides global white text */
+.youth-gallery-section h1, .youth-gallery-section h2, .youth-gallery-section p, .youth-gallery-section a { color: #071726 }
+
+@media (max-width: 980px) {
+    .youth-gallery { flex-direction: column; }
+    .youth-gallery.simple .tall-slider { width: 100%; min-height: 220px }
+    .youth-gallery.simple .big-slider { min-height: 380px }
+}
+
+@media (max-width: 560px) {
+    .youth-gallery-section { padding: 28px 0 }
+    .youth-gallery .small-sliders { gap: 10px }
+    .small-slider { height: 120px }
+    .slide-prev, .slide-next { width: 38px; height: 38px; }
+}
+
+/* Mobile tweaks for `youth.html` to ensure images are visible and text is centred */
+@media (max-width: 700px) {
+    .youth-intro .section-title { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
+    .youth-intro .intro-logo { height: 28px; margin-right: 0; margin-bottom: 6px; }
+    .youth-intro .section-title .title-youth,
+    .youth-intro .section-title .title-rest { display: block; font-size: 28px; line-height: 1; }
+    .youth-intro .section-title .title-youth { color: var(--brand-blue); }
+    .youth-intro .section-title .title-rest { color: #7fd3ff; }
+
+    .youth-gallery.simple { flex-direction: column; gap: 14px; }
+    .youth-gallery.simple .big-slider { min-height: 260px; border-radius: 12px; }
+    /* On mobile the tall slider becomes a centred portrait section below the landscape */
+    .youth-gallery.simple .tall-slider {
+        width: 86%;
+        max-width: 360px;
+        margin: 12px auto 0;
+        border-radius: 12px;
+        /* make it portrait: taller than wide */
+        aspect-ratio: 3 / 4;
+        min-height: 360px;
+        overflow: hidden;
+        display: block;
+    }
+
+    /* Slideshow on mobile: keep slides absolutely positioned and use .active to show one at a time */
+    .slider, .slider .slides { height: auto; min-height: 0; }
+    .slider .slides { position: relative; height: 100%; }
+    .slider .slides .slide {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity .45s ease;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-color: transparent;
+    }
+    .slider .slides .slide.active { opacity: 1; }
+
+    /* Ensure each slider shows a visible area on mobile by setting min-height on the slides container */
+    .youth-gallery.simple .big-slider .slides { min-height: 260px }
+    .youth-gallery.simple .tall-slider .slides { min-height: 180px }
+
+    /* hide desktop controls on phones to save space (but keep them on the main landscape slideshow) */
+    .slide-prev, .slide-next { display: none !important; }
+    /* Exception: ensure navigation remains available on mobile for both sliders so users can manually advance */
+    .youth-gallery.simple .big-slider .slide-prev,
+    .youth-gallery.simple .big-slider .slide-next,
+    .youth-gallery.simple .tall-slider .slide-prev,
+    .youth-gallery.simple .tall-slider .slide-next {
+        display: inline-flex !important;
+    }
+
+    /* Keep short intro heading centered, but left-align long paragraph text for readability */
+    .youth-gallery-section .lead { text-align: left; font-weight: 400; color: #000; }
+
+    /* left-align the join/summary paragraph under the gallery on phones */
+    .youth-gallery-section > p { text-align: left; color: #000; }
+
+    /* centre the decorative dashes on small screens */
+    .youth-gallery-section .decor-lines { text-align: center }
+
+    /* make caption pill visible and compact on phones */
+    .big-slider .slide-caption { left: 12px; bottom: 12px; padding: 6px 10px; font-size: 13px }
+
+    /* Prevent sliders from touching the screen edges on small devices */
+    .youth-gallery-section { padding-left: 14px; padding-right: 14px; box-sizing: border-box; }
+    .youth-gallery.simple .big-slider { margin: 0 10px; max-width: calc(100% - 20px); }
+
+    /* shorten the "Learn more" / CTA button in the What We Believe hero on phones
+
+/* scroll-triggered slideshow animations */
+.feature {
+    opacity: 0;
+    transition: transform 0.72s cubic-bezier(0.22,0.8,0.28,1), opacity 0.72s cubic-bezier(0.22,0.8,0.28,1);
+    will-change: transform, opacity;
+}
+.feature.slide-left { transform: translateX(-120px); }
+.feature.slide-right { transform: translateX(120px); }
+.feature.in-view { opacity: 1; transform: translateX(0); }
+
+/* animate out state: when element leaves viewport we slide it away and fade */
+#about .feature.out-view { opacity: 0; }
+#about .feature.slide-left.out-view { transform: translateX(-120px); }
+#about .feature.slide-right.out-view { transform: translateX(120px); }
+
+/* Mobile: disable fade-out animation so leaving a section hides it immediately.
+    Keep the smooth enter (in-view) transition so the fade-in remains natural. */
+@media (max-width: 700px) {
+     #about .feature { transition: transform 0.72s cubic-bezier(0.22,0.8,0.28,1), opacity 0.72s cubic-bezier(0.22,0.8,0.28,1); }
+     /* When the element is marked out-view on mobile, remove transition so
+         it disappears instantly rather than fading out. */
+     #about .feature.out-view { transition: none !important; opacity: 0; }
+}
+
+/* Ensure feature blocks are visible on small screens even if JS doesn't
+   add the `.in-view` class (some mobile browsers may delay or block the
+   scroll-trigger script). This forces features to render normally on phones. */
+@media (max-width: 700px) {
+    .feature {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
+}
+
+/* Mobile-only: restore slide-in animation for the #about section features
+   while keeping other .feature blocks immediately visible. We use
+   !important to override the general mobile rule above, and target the
+   `.slide-left` / `.slide-right` helper classes to control direction. */
+@media (max-width: 700px) {
+    /* Keep #about features visible on phones by default so content is
+       readable immediately. Desktop still uses the scroll-triggered
+       in-view/out-view pattern defined later. */
+    #about .feature {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
+
+    /* Mobile-only: when JS adds `mobile-animate` to #about we run a
+       one-shot slide-in animation for the child feature blocks. This
+       avoids hiding content before the user scrolls while still
+       providing the desired motion on phones. */
+    #about.mobile-animate .feature.slide-left {
+        animation: sg-slide-from-left 720ms cubic-bezier(0.22,0.8,0.28,1) forwards;
+        animation-delay: 120ms;
+    }
+
+    #about.mobile-animate .feature.slide-right {
+        animation: sg-slide-from-right 720ms cubic-bezier(0.22,0.8,0.28,1) forwards;
+        animation-delay: 220ms;
+    }
+
+    @keyframes sg-slide-from-left {
+        from { transform: translateX(-120px); opacity: 0 }
+        to   { transform: translateX(0); opacity: 1 }
+    }
+
+    @keyframes sg-slide-from-right {
+        from { transform: translateX(120px); opacity: 0 }
+        to   { transform: translateX(0); opacity: 1 }
+    }
+}
+
+/* Mobile: make the Latest Message text slide in from the right (offscreen)
+   so it appears to enter from the edge of the phone viewport. */
+@media (max-width: 700px) {
+    #latest-message .video-info {
+        /* start off-screen to the right on phones */
+        transform: translateX(100vw);
+        opacity: 0;
+
+    /* Mobile-only animation for the #about heading and content */
+    #about .feature-content h2,
+    #about .feature-content p,
+    #about .feature-content .btn {
+        opacity: 0;
+        transform: translateY(18px);
+        will-change: transform, opacity;
+    }
+
+    /* When JS adds `mobile-animate` to #about we animate the heading/content */
+    #about.mobile-animate .feature-content h2 {
+        animation: sg-fade-up 680ms cubic-bezier(0.22,0.8,0.28,1) forwards;
+        animation-delay: 80ms;
+    }
+    #about.mobile-animate .feature-content p {
+        animation: sg-fade-up 700ms cubic-bezier(0.22,0.8,0.28,1) forwards;
+        animation-delay: 220ms;
+    }
+    #about.mobile-animate .feature-content .btn {
+        animation: sg-fade-up 760ms cubic-bezier(0.22,0.8,0.28,1) forwards;
+        animation-delay: 420ms;
+    }
+
+    @keyframes sg-fade-up {
+        from { transform: translateY(18px); opacity: 0 }
+        to   { transform: translateY(0); opacity: 1 }
+    }
+
+    /* Respect users who prefer reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+        #about .feature-content h2,
+        #about .feature-content p,
+        #about .feature-content .btn,
+        #about .feature { animation: none !important; transition: none !important; transform: none !important; opacity: 1 !important; }
+    }
+        will-change: transform, opacity;
+    }
+
+    .video-info.slide-in {
+        animation: slideInFadeMobile 1200ms cubic-bezier(0.16, 0.84, 0.24, 1) forwards;
+    }
+
+    @keyframes slideInFadeMobile {
+        0% {
+            transform: translateX(100vw);
+            opacity: 0;
+        }
+        60% {
+            transform: translateX(8px);
+            opacity: 1;
+        }
+        100% {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+}
+
+
+       keep the pill shape but avoid full-width so it appears shorter like in the design */
+    #what-we-believe .card-btn {
+        display: inline-block;
+        width: auto !important;
+        min-width: 140px;
+        padding: 10px 18px;
+        border-radius: 999px;
+        box-sizing: border-box;
+    }
+}
+
+/* Desktop / Global: scroll-triggered slideshow animations only for #about section */
+#about .feature { opacity: 0; }
+#about .feature.slide-left { transform: translateX(-120px); transition: transform 0.7s ease-in-out, opacity 0.7s ease-in-out; }
+#about .feature.slide-right { transform: translateX(120px); transition: transform 0.7s ease-in-out, opacity 0.7s ease-in-out; }
+#about .feature.in-view { opacity: 1; transform: translateX(0); }
+
+/* Video info slide-in: start off-screen to the right and hidden */
+#latest-message .video-info {
+    opacity: 0;
+    transform: translateX(120px);
+    will-change: transform, opacity;
+}
+
+/* When JS adds .slide-in we run a one-shot animation that slides in from the
+   right while fading opacity. This avoids an abrupt bounce and produces a
+   smooth, natural entrance. `forwards` keeps final state. */
+.video-info.slide-in {
+    /* simple smooth slide-in from the right with no vertical bounce */
+    animation: slideInFade 1500ms cubic-bezier(0.16, 0.84, 0.24, 1) forwards;
+}
+
+@keyframes slideInFade {
+    0% {
+        transform: translateX(60px);
+        opacity: 0;
+    }
+    60% {
+        transform: translateX(8px);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Smooth staggered reveal for internal elements so lines fade in naturally */
+.video-info .eyebrow,
+.video-info .video-title,
+.video-info .video-desc {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 420ms cubic-bezier(0.22, 0.9, 0.2, 1), transform 420ms cubic-bezier(0.22, 0.9, 0.2, 1);
+}
+.video-info.slide-in .eyebrow { transition-delay: 320ms; opacity: 1; transform: translateY(0); }
+.video-info.slide-in .video-title { transition-delay: 520ms; opacity: 1; transform: translateY(0); }
+.video-info.slide-in .video-desc { transition-delay: 760ms; opacity: 1; transform: translateY(0); }
+
+/* Give the decorative swash under `.video-em` a little more breathing room */
+.video-em { padding-bottom: 18px; }
+.video-em::after {
+    bottom: -18px; /* move swash further down from the text */
+    height: 40px;
+    background-size: 160% auto; /* slightly larger so it sits nicely under the text */
+}
+
+/* Scroll-triggered slide-in for featured ministries cards */
+#featured-ministries .ministries-grid .card {
+    opacity: 0;
+    transform: translateX(0);
+    will-change: transform, opacity;
+}
+
+/* "Meet our leaders" section slide-in animations */
+#meet-leaders .leader-intro,
+#meet-leaders figure.leader-photo {
+    opacity: 0;
+    will-change: transform, opacity;
+}
+#meet-leaders.animate .leader-intro {
+    animation: slideInFromLeft 1200ms ease-out forwards;
+}
+#meet-leaders.animate figure.leader-photo {
+    animation: slideInFromRight 1200ms ease-out forwards;
+    animation-delay: 200ms;
+}
+/* use nth-of-type to ignore the inline <style> element placed inside
+   the grid; anchors are the only <a> elements so this counts correctly */
+#featured-ministries.animate .ministries-grid > a:nth-of-type(-n+2) {
+    animation: slideInBounceLeft 1800ms cubic-bezier(0.19,0.85,0.29,1) forwards;
+}
+#featured-ministries.animate .ministries-grid > a:nth-of-type(1) { animation-delay: 0ms; }
+#featured-ministries.animate .ministries-grid > a:nth-of-type(2) { animation-delay: 120ms; }
+#featured-ministries.animate .ministries-grid > a:nth-of-type(3) {
+    animation: slideInBounceRight 1800ms cubic-bezier(0.19,0.85,0.29,1) forwards;
+    animation-delay: 240ms;
+}
+#featured-ministries.animate .ministries-grid > a:nth-of-type(4) {
+    animation: slideInBounceRight 1800ms cubic-bezier(0.19,0.85,0.29,1) forwards;
+    animation-delay: 360ms;
+}
+
+@keyframes slideInBounceLeft {
+    0% {
+        transform: translateX(-100vw);
+        opacity: 0;
+    }
+    60% {
+        transform: translateX(8px);
+        opacity: 1;
+    }
+    80% {
+        transform: translateX(-4px);
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInBounceRight {
+    0% {
+        transform: translateX(100vw);
+        opacity: 0;
+    }
+    60% {
+        transform: translateX(-8px);
+        opacity: 1;
+    }
+    80% {
+        transform: translateX(4px);
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInFromLeft {
+    0% { transform: translateX(-100vw); opacity: 0; }
+    60% { transform: translateX(8px); opacity: 1; }
+    80% { transform: translateX(-4px); }
+    100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInFromRight {
+    0% { transform: translateX(100vw); opacity: 0; }
+    60% { transform: translateX(-8px); opacity: 1; }
+    80% { transform: translateX(4px); }
+    100% { transform: translateX(0); opacity: 1; }
+}
+
+/* Explicit final state to ensure the text remains visible after animation
+   (use high-specificity selector so base rule doesn't override it). */
+#latest-message .video-info.animated-in {
+    opacity: 1 !important;
+    transform: translateX(0) translateY(0) !important;
+    visibility: visible !important;
+}
+
+/* Minor stagger for children so multi-line content feels natural */
+.video-info.slide-in .eyebrow { animation: none; opacity: 1 }
+.video-info.slide-in .video-title { animation: none; opacity: 1 }
+.video-info.slide-in .video-desc { animation: none; opacity: 1 }
+
+/* Ensure the thumbnail and card remain visible after the animation and
+   don't get hidden when the user scrolls away. This is intentionally
+   persistent for the page lifetime (resets only on refresh). */
+#latest-message .video-card,
+#latest-message .video-thumb img {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+
+
+
+
+
+/* Give section styles */
+.give-section .give-grid {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.give-section .give-card {
+    flex: 1 1 0;
+    padding: 22px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(11,58,102,0.04), rgba(11,58,102,0.02));
+    color: var(--brand-blue-deep);
+    box-shadow: 0 6px 20px rgba(11,58,102,0.04);
+}
+
+.give-section .bank-details {
+    background: #fff;
+    border: 1px solid rgba(11,58,102,0.06);
+}
+
+.give-section .give-buttons { display:flex; gap:12px; margin-top:14px; }
+
+@media (max-width: 900px) {
+    .give-section .give-grid { flex-direction: column; }
+}
+
+/* Very dark give page background and adjusted text for contrast */
+.page-give {
+    background: #072449;
+    min-height: 100vh;
+}
+
+.page-give .site-header { background: transparent }
+.page-give .section { padding-top: 80px; padding-bottom: 80px }
+.page-give h1, .page-give h2, .page-give h3, .page-give p { color: var(--muted) }
+
+/* Standard dark-blue background (used by Location / Latest Message sections)
+   Apply this class to any section that should use the location-style blue. */
+.bg-blue-standard {
+    background: #072449;
+    color: #fff;
+}
+
+.bg-blue-standard .muted-italic,
+.bg-blue-standard p,
+.bg-blue-standard h1,
+.bg-blue-standard h2,
+.bg-blue-standard h3 { color: rgba(255,255,255,0.92) }
+
+/* Increase space below the fixed header on small screens for contact section */
+@media (max-width: 700px) {
+    #contact {
+        padding-top: 140px; /* matches Give page spacing on mobile */
+    }
+}
+
+/* Mobile: center Contact heading, intro text and the email line */
+@media (max-width: 700px) {
+    #contact .feature {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    #contact .feature-content {
+        text-align: center;
+        width: 100%;
+        max-width: 760px;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    /* make the form centered and full-width on small screens */
+    #contact form#contact-form {
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+        max-width: 520px;
+    }
+}
+
+/* highlight small pieces of text light blue */
+.text-light-blue { color: lightblue; }
+
+
+    #contact .muted-italic { text-align: center; display:block; }
+
+
+/* Recent video card styling (children page) */
+.recent-video { margin-top: 28px; text-align: center; }
+.recent-video-title { font-size: 22px; margin-bottom: 12px; color: #062246; font-weight: 800; }
+
+.video-card { display: block; width: 100%; max-width: 100%; margin: 0 auto; text-decoration: none; color: inherit; }
+.video-wrap { position: relative; border-radius: 12px; overflow: hidden; background: #000; margin: 6px 0; }
+.video-wrap img { display: block; width: 100%; height: auto; object-fit: cover; transition: transform .35s ease; }
+.video-card:hover .video-wrap img, .video-card:focus .video-wrap img { transform: scale(1.03); }
+.video-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.12) 40%, rgba(0,0,0,0.32) 100%); transition: opacity .22s ease; }
+.play-button { width: 96px; height: 96px; background: rgba(0,0,0,0.55); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(0,0,0,0.32); pointer-events: none; }
+.video-topbar { position: absolute; left: 0; right: 0; top: 0; background: #000; color: #fff; text-align: center; padding: 14px 12px; font-weight: 800; z-index: 4; border-top-left-radius: 12px; border-top-right-radius: 12px; }
+.video-meta { margin-top: 12px; }
+.video-label { display: inline-block; padding: 12px 20px; font-size: 16px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.06); background: transparent; color: var(--muted); transition: all .18s ease; }
+.video-card:hover .video-label, .video-card:focus .video-label { background: var(--brand-blue); color: #fff; border-color: var(--brand-blue-dark); transform: translateY(-2px); }
+
+@media (max-width: 700px) {
+    .recent-video-title { font-size: 20px; }
+    .play-button { width: 68px; height: 68px; }
+    .video-label { font-size: 15px; padding: 10px 16px; }
+    .video-topbar { padding: 10px 8px; font-size: 16px; }
+}
+
+/* Improve readability of hero-cards text on small screens: add a subtle
+   dark overlay to images and ensure card text is white with shadow. */
+@media (max-width: 700px) {
+    .hero-cards .card {
+        overflow: hidden;
+        position: relative;
+    }
+
+    .hero-cards .card .card-img {
+        /* use aspect-ratio block on mobile so image fills card area
+           and body can overlay it */
+        position: relative;
+        display: block;
+        height: auto !important;
+        padding-top: 75% !important; /* controls image aspect ratio */
+        background-size: cover !important;
+        background-position: center !important;
+    }
+
+    .hero-cards .card .card-img::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(rgba(0,0,0,0.46), rgba(0,0,0,0.18));
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .hero-cards .card-body {
+        /* overlay the body on top of the image for a single unified card */
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 2;
+        padding: 14px !important;
+        background: linear-gradient(to top, rgba(0,0,0,0.56), rgba(0,0,0,0.0));
+        color: #ffffff;
+    }
+
+    .hero-cards .card-body h3,
+    .hero-cards .card-body p,
+    .hero-cards .card-body .card-btn span {
+        color: #ffffff !important;
+        text-shadow: 0 6px 18px rgba(0,0,0,0.6);
+    }
+
+    /* Override: ensure when the button is hovered/pressed/focused/touch-active the text becomes black
+       This rule is placed after the general white rule to win due to source order. */
+    .hero-cards .card-body .card-btn.touch-active span,
+    .hero-cards .card-body .card-btn:active span,
+    .hero-cards .card-body .card-btn:focus span,
+    .hero-cards .card-body .card-btn:hover span {
+        color: #000 !important;
+        text-shadow: none !important;
+    }
+
+    /* Make the button pill more visible on top of image */
+    .hero-cards .card-btn {
+        position: relative;
+        z-index: 3;
+    }
+}
+
+/* Make footer phone links look like regular white text while remaining clickable
+   and accessible. Keeps visited color identical and provides a focus-visible
+   outline for keyboard users. */
+.site-footer .footer-call,
+.footer-call {
+    color: #ffffff;
+    text-decoration: none;
+    border-bottom: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.footer-call:visited { color: inherit; }
+
+.footer-call:hover {
+    opacity: 0.95;
+    text-decoration: none;
+}
+
+.footer-call:focus-visible {
+    outline: 2px solid rgba(255,255,255,0.12);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Fade‑in / slide‑up animation for headings, paragraphs, list items, etc. */
+.fade-slide-up {
+    opacity: 0;
+    transform: translateY(1rem);
+    transition: opacity var(--anim-duration, 0.5s) ease-out, transform var(--anim-duration, 0.5s) ease-out;
+    /* allow each element to supply its own delay via inline style */
+}
+
+.fade-slide-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* helper: use CSS variable for any element that wants custom delay */
+.fade-slide-up[data-delay] {
+    transition-delay: var(--delay, 0s);
+}
+
+/* Make social icons white in footers, profiles and social blocks */
+.social-links svg,
+.footer-socials svg,
+.social-link svg,
+.social-links svg *,
+.footer-socials svg *,
+.social-link svg * {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    vertical-align: middle;
+    color: #fff;
+}
+
+.social-links svg path,
+.social-links svg circle,
+.social-links svg rect,
+.social-links svg polygon,
+.social-links svg line,
+.social-links svg polyline,
+.footer-socials svg path,
+.footer-socials svg circle,
+.footer-socials svg rect,
+.footer-socials svg polygon,
+.footer-socials svg line,
+.footer-socials svg polyline,
+.social-link svg path,
+.social-link svg circle,
+.social-link svg rect,
+.social-link svg polygon,
+.social-link svg line,
+.social-link svg polyline {
+    fill: #fff !important;
+    stroke: #fff !important;
+}
+
+
+
+
+
+
+
+

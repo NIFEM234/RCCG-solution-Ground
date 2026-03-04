@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="RCCG Solution Ground — a warm, family-oriented church in Gravesend, Kent. Service times, ministries, events, and contact information." />
+    <link rel="icon" href="img/Solution ground LOGO.avif" />
+    <title>Children — RCCG Solution Ground</title>
+    <script>document.documentElement.classList.add('no-transitions');</script>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <style>
+    /* Recent children video card fixes */
+    .recent-video{margin-top:28px; margin-bottom:28px; max-width:1100px; padding:0 16px;}
+    .recent-video .video-card{display:block;text-decoration:none;color:inherit;border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.12);}
+    .recent-video .video-wrap{position:relative;background:#000;}
+    .recent-video .video-wrap img{width:100%;height:auto;display:block;object-fit:cover;}
+    .recent-video .video-topbar{position:absolute;top:0;left:0;width:100%;background:rgba(0,0,0,0.9);color:#fff;padding:12px 16px;text-align:center;font-weight:700;line-height:1.2;z-index:3;font-size:0.95rem}
+    .recent-video .video-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none}
+    .recent-video .play-button{width:86px;height:86px;border-radius:50%;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,0.35)}
+    .recent-video .play-button svg{width:44px;height:44px}
+    .recent-video .video-meta{padding:12px 16px;text-align:center;color:var(--muted)}
+    @media (max-width:600px){.recent-video{padding:0 12px}.recent-video .play-button{width:64px;height:64px}.recent-video .video-topbar{font-size:0.9rem;padding:10px 12px}}
+    /* Video grid layout (latest children message/card) */
+    .video-grid{display:grid;grid-template-columns:1fr 420px;gap:24px;align-items:center;max-width:1100px;padding:0 16px;margin:28px auto}
+    .video-card{border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.12);}
+    .video-thumb{display:block;position:relative}
+    .video-thumb img{width:100%;height:auto;display:block;object-fit:cover}
+    .play-icon{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:86px;height:86px;border-radius:50%;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:2}
+    .play-icon::before{content:'';display:block;width:0;height:0;border-left:20px solid #fff;border-top:12px solid transparent;border-bottom:12px solid transparent;margin-left:6px}
+    .video-info .eyebrow{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--muted);margin:0 0 6px}
+    .eyebrow-badge{width:36px;height:36px;display:block}
+    .video-title{margin:6px 0 8px}
+    .video-desc{margin:0 0 14px;color:var(--muted)}
+    /* Center the video info and CTA button on all viewports */
+    .video-info{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px}
+    .video-info .eyebrow{justify-content:center}
+    @media (max-width:900px){.video-grid{grid-template-columns:1fr;}.video-info{text-align:center}}
+    </style>
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container nav-wrap">
+            <a class="logo" href="index.html">
+                <img src="img/Solution ground LOGO.avif" alt="Solution Ground logo" loading="lazy" />
+                <span>Solution Ground</span>
+            </a>
+            <nav class="main-nav">
+                <ul>
+                    <li class="has-dropdown">
+                        <a href="index.html">Welcome</a>
+                        <ul class="dropdown">
+                            <li><a href="who-are-we.html">Who are we?</a></li>
+                            <li><a href="new-here.html">New here?</a></li>
+                            <li><a href="overseers.html">Overseers</a></li>
+                            
+                        </ul>
+
+                    </li>
+                    <li class="has-dropdown">
+                        <a href="ministries.html">Ministries</a>
+                        <ul class="dropdown">
+                            <li><a href="children.html">Children</a></li>
+                            <li><a href="youth.html">Youth</a></li>
+                            <li><a href="groups.html">Groups</a></li>
+                            <li><a href="evangelism.html">Evangelism</a></li>
+                        </ul>
+                    </li>
+
+                      <li class="has-dropdown">
+                        <a href="watch.html">Watch</a>
+                        <ul class="dropdown">
+                            <li><a href="https://www.youtube.com/@RCCGSolutionGroundKent">Sermons</a></li>
+                        </ul>
+                    </li>
+
+                    <li><a href="location.html">Location</a></li>
+
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <a class="btn-give" href="give.html">Give</a>
+        </div>
+    </header>
+
+    <main>
+       <section id="hero" class="hero">
+            <div class="hero-slideshow" aria-hidden="false">
+            <div class="slide" data-bg="img/Children header .jpeg"></div>
+        </div>
+  <div class="hero-overlay">
+                <div class="container">
+                    <div class="container">
+                    <h1 class="hero-title"><span>Children at RCCG Solution Ground</span></h1>
+                    <p class="hero-subtitle">Fun, faith-filled spaces for our youngest members</p>
+                </div>
+                <!-- Scroll-down hint removed -->
+            </div>
+    </section>
+
+
+        <section class="section container" id="children-overview" style="padding-top:120px">
+
+
+            <!-- Two specific age-group sections (alternating layout) -->
+            <div id="age-0-5" class="feature" style="margin-top:48px">
+                <div class="feature-content">
+                    <div class="feature-badge"><img src="img/Solution ground LOGO.avif" alt="logo" loading="lazy"/></div>
+                    <h2>Age 0–5</h2>
+                    <p>Safe, playful spaces for toddlers and preschoolers. Activities include simple worship, crafts, and story time designed to help little ones start a life of faith.</p>
+                    <a class="btn btn-dark" href="contact.html">contact us on ages 0–5</a>
+                </div>
+                <div class="feature-img">
+                    <figure class="feature-carousel" aria-hidden="false">
+                        <div class="feature-slide" data-name="Toddlers class" data-description="Toddlers in play" data-bg="img/Zero to five, baby 02.jpeg"></div>
+                        <div class="feature-slide" data-name="Nursery time" data-description="Nap and play" data-bg="img/Zero to five, baby, 02.jpeg"></div>
+                        <div class="feature-slide" data-name="Playtime" data-description="Songs & crafts" data-bg="img/KIDS01.jpeg"></div>
+                        <div class="feature-slide" data-name="Story time" data-description="Bible stories" data-bg="img/KIDS02.jpeg"></div>
+                        <div class="feature-slide" data-name="Group activities" data-description="Games" data-bg="img/KIDS03.jpeg"></div>
+                        <div class="feature-carousel-indicators"></div>
+                        <figcaption class="carousel-caption">Age 0–5</figcaption>
+                        <div class="carousel-description sr-only">Toddlers & nursery</div>
+                    </figure>
+                </div>
+            </div>
+
+            <div id="age-5-13" class="feature reverse" style="margin-top:48px">
+                <div class="feature-img">
+                    <figure class="feature-carousel" aria-hidden="false">
+                        <div class="feature-slide" data-name="Kids group" data-description="Kids learning" data-bg="img/Five to thirteen image 01.jpeg"></div>
+                        <div class="feature-slide" data-name="Youth kids" data-description="Games and teaching" data-bg="img/Five two thirteen image 02.jpeg"></div>
+                        <div class="feature-slide" data-name="Sunday group" data-description="Group photo" data-bg="img/Kid Image 01.jpg"></div>
+                        <div class="feature-slide" data-name="Evangelism" data-description="Community events" data-bg="img/Kids image 02.jpg"></div>
+                        <div class="feature-slide" data-name="Team" data-description="Leaders and helpers" data-bg="img/Kid Image 03.jpg"></div>
+                        <div class="feature-carousel-indicators"></div>
+                        <figcaption class="carousel-caption">Age 5–13</figcaption>
+                        <div class="carousel-description sr-only">Primary school age</div>
+                    </figure>
+                </div>
+                <div class="feature-content">
+                    <div class="feature-badge"><img src="img/Solution ground LOGO.avif" alt="logo" loading="lazy"/></div>
+                    <h2>Age 5–13</h2>
+                    <p>Engaging teaching, games, and small groups for primary-school-aged children. We focus on Bible stories, memory verses, and practical friendship-building.</p>
+                    <a class="btn btn-dark" href="contact.html">contact us on ages 5–13 </a><br>
+                </div>
+            </div>
+            <!-- Latest children message / video (tailored layout) -->
+            <section id="latest-children" class="section light">
+                <div class="container video-grid">
+                    <div class="video-card">
+                        <a class="video-thumb" href="https://www.youtube.com/watch?v=siv3bF-23Ic" target="_blank" rel="noopener noreferrer">
+                            <img loading="lazy" src="https://img.youtube.com/vi/siv3bF-23Ic/hqdefault.jpg" alt="Children Day Program thumbnail">
+                            <span class="play-icon" aria-hidden="true"></span>
+                        </a>
+                    </div>
+
+                    <div class="video-info">
+                        <p class="eyebrow">
+                            <img class="eyebrow-badge" src="img/Solution ground LOGO.avif" alt="badge" loading="lazy">
+                            <span>RECENT CHILDREN PROGRAM</span>
+                        </p>
+                        <a href="https://www.youtube.com/@RCCGSolutionGroundKent" class="btn btn-dark" target="_blank" rel="noopener noreferrer">SEE MORE OF OUR STREAMS</a>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div class="footer-col">
+                <a class="footer-btn footer-logo" href="new-here.html#what-to-expect" aria-label="Sundays">
+                    <img src="img/Solution ground LOGO.avif" alt="RCCG Solution Ground logo" style="width:28px;height:28px;display:block" loading="lazy" />
+                </a>
+                <h4>Sundays</h4>
+                <p>8:30 AM to 11:30 AM</p>
+            </div>
+            <div class="footer-col">
+                <a class="footer-btn" href="contact.html" aria-label="Contact">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24 11.36 11.36 0 0 0 3.56.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h2.5a1 1 0 0 1 1 1 11.36 11.36 0 0 0 .57 3.56 1 1 0 0 1-.24 1.01l-2.2 2.2z"/></svg>
+                </a>
+                <h4>Call Us</h4>
+                <p><a class="footer-call" href="tel:+447491644150">07491 644150</a></p>
+            </div>
+            <div class="footer-col">
+                <a class="footer-btn" href="location.html" aria-label="Find Us">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zM12 11.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
+                </a>
+                <h4>Find Us</h4>
+                <p>Palmer Avenue, Kingsfarm<br/>Gravesend, Kent<br/>DA12 5DQ</p>
+            </div>
+        </div>
+        <div class="container" style="text-align:center;margin-top:18px;">
+            <div class="footer-socials" style="margin-bottom:12px;">
+                <a class="social-link" href="https://www.facebook.com/rccgsolutiongroundkent/?locale=en_GB" aria-label="Facebook">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M22 12a10 10 0 1 0-11.5 9.9v-7h-2.2v-2.9h2.2V9.3c0-2.2 1.3-3.5 3.3-3.5.96 0 1.97.17 1.97.17v2.2h-1.13c-1.12 0-1.47.7-1.47 1.42v1.7h2.5l-.4 2.9h-2.1v7A10 10 0 0 0 22 12z"/></svg>
+                </a>
+                <a class="social-link" href="https://www.instagram.com/rccg_solutionground/" aria-label="Instagram">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 6.1A4.9 4.9 0 1 0 16.9 13 4.9 4.9 0 0 0 12 8.1zM18.5 5.5a1.2 1.2 0 1 0 1.2 1.2 1.2 1.2 0 0 0-1.2-1.2z"/></svg>
+                </a>
+                <a class="social-link" href="https://www.youtube.com/@RCCGSolutionGroundKent" aria-label="YouTube" target="_blank" rel="noopener noreferrer">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M23.5 6.2a3 3 0 0 0-2.12-2.13C19.75 3.5 12 3.5 12 3.5s-7.75 0-9.38.57A3 3 0 0 0 .5 6.2 31.1 31.1 0 0 0 0 12a31.1 31.1 0 0 0 .5 5.8 3 3 0 0 0 2.12 2.13C4.25 20.5 12 20.5 12 20.5s7.75 0 9.38-.57A3 3 0 0 0 23.5 17.8 31.1 31.1 0 0 0 24 12a31.1 31.1 0 0 0-.5-5.8zM10 8.6l5.27 3.36L10 15.3V8.6z"/></svg>
+                </a>
+            </div>
+            <p class="footer-charity muted" style="margin-top:8px; font-size:13px;">This church is operating as a registered charity in England (1207345).</p>
+        </div>
+    </footer>
+
+    <!-- Back to top control (shows after scrolling) -->
+    <button id="back-to-top" aria-label="Back to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 15l6-6 6 6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+
+    <script src="js/main.js"></script>
+
+    <!-- Mobile floating bottom navigation (mobile-only) -->
+    <nav class="mobile-bottom-nav" aria-label="Primary" role="navigation">
+        <div class="mbn-container">
+            <a class="mbn-item mbn-home active" href="index.html" data-tab="home" aria-label="Home">
+                <!-- Home icon (line style) -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M3 10.5L12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10.5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+
+            <a class="mbn-item" href="ministries.html" aria-label="Ministries" data-tab="ministries">
+                <!-- Praying hands icon (keeps same size/line weight) -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M12 2c0 3-3 6-4 8-1 2-1 4 0 6l4 6 4-6c1-2 1-4 0-6-1-2-4-5-4-8z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <path d="M8 8s1 2 2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <path d="M16 8s-1 2-2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+            </a>
+
+            <a class="mbn-item" href="location.html" aria-label="Location" data-tab="location">
+                <!-- Location icon -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="12" cy="9" r="2.2" stroke="currentColor" stroke-width="1.4"/>
+                </svg>
+            </a>
+
+            <a class="mbn-item" href="contact.html" aria-label="Contact" data-tab="contact">
+                <!-- Phone icon (outline, matching size/weight) -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c.3.1 1.1.27 1.8.27a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h2.5a1 1 0 0 1 1 1c0 .6.17 1.3.27 1.8a1 1 0 0 1-.24 1.01l-2.2 2.2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+        </div>
+
+        <!-- Floating action button (opens chat) - chatbot avatar -->
+        <button class="mbn-fab" aria-label="Open chat" title="Open chat">
+            <!-- Use same avatar glyph as desktop chat-toggle for visual consistency -->
+            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                <circle class="fab-bg" cx="32" cy="32" r="30" />
+                <rect class="fab-face" x="14" y="20" width="36" height="28" rx="6" />
+                <circle class="fab-eye" cx="24" cy="32" r="3" />
+                <circle class="fab-eye" cx="40" cy="32" r="3" />
+                <path class="fab-mouth" d="M26 40c2 2 10 2 12 0" stroke-width="2" stroke-linecap="round" fill="none" />
+            </svg>
+        </button>
+    </nav>
+
+    <!-- Chatbot toggle (bottom-left) -->
+    <button id="chat-toggle" class="chat-toggle" aria-label="Open SG Assistant" title="SG Assistant">
+        <svg width="34" height="34" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <circle cx="32" cy="32" r="30" fill="#1e73ff" />
+            <rect x="14" y="20" width="36" height="28" rx="6" fill="#fff" />
+            <circle cx="24" cy="32" r="3" fill="#1e73ff" />
+            <circle cx="40" cy="32" r="3" fill="#1e73ff" />
+            <path d="M26 40c2 2 10 2 12 0" stroke="#1e73ff" stroke-width="2" stroke-linecap="round" fill="none" />
+        </svg>
+    </button>
+
+    <!-- Chat window (hidden by default) -->
+    <aside id="chat-window" class="chat-window" aria-hidden="true" role="dialog" aria-label="SG Assistant">
+        <header class="chat-header">
+            <div class="chat-title">
+                <svg width="22" height="22" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                    <circle cx="32" cy="32" r="30" fill="#1e73ff" />
+                    <rect x="14" y="20" width="36" height="28" rx="6" fill="#fff" />
+                </svg>
+                <strong>SG Assistant</strong>
+            </div>
+            <button id="chat-close" class="chat-close" aria-label="Close chat">✕</button>
+        </header>
+        <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
+
+        <form id="chat-form" class="chat-form" autocomplete="off">
+            <input id="chat-input" class="chat-input" type="text" placeholder="Ask about this website (location, serving, ministries)..." />
+            <button type="submit" class="chat-send">Send</button>
+        </form>
+    </aside>
+
+</body>
+
+</html>
