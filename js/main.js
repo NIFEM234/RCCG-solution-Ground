@@ -2213,6 +2213,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     let dragPointerId = null;
                     let dragTimer = null;
                     let currentTarget = null;
+                    // Flag used to suppress the browser's native click event that
+                    // follows a pointerup after a drag. We allow programmatic clicks
+                    // (element.click()) by checking event.isTrusted in the click handler.
+                    let justEndedDrag = false;
 
                     function findItemAt(clientX, clientY) {
                         // prefer bounding-box detection for each item
@@ -2269,17 +2273,48 @@ document.addEventListener('DOMContentLoaded', function() {
                     function endDrag(e) {
                         if (dragTimer) { clearTimeout(dragTimer); dragTimer = null; }
                         if (dragging && e && e.pointerId === dragPointerId) {
-                            // commit to the current target
-                            if (currentTarget) {
-                                // remove temporary target class and trigger click
-                                currentTarget.classList.remove('mbn-gloss-target');
-                                // trigger the existing click behavior (navigation or panel switch)
-                                try { currentTarget.click(); } catch (err) {}
+                            // commit to the current target — allow programmatic click
+                            // to run normally while suppressing the native click that
+                            // the browser will emit after pointerup.
+                            const targetToClick = currentTarget;
+                            if (targetToClick) {
+                                targetToClick.classList.remove('mbn-gloss-target');
+                                // mark that a drag just ended so we can suppress the
+                                // following native (trusted) click event from the browser
+                                justEndedDrag = true;
+                                try { if (e && e.pointerId) container.releasePointerCapture(e.pointerId); } catch (err) {}
+                                // clear dragging state BEFORE triggering the programmatic click
+                                dragging = false; dragPointerId = null; currentTarget = null;
+                                try { targetToClick.click(); } catch (err) {}
+                                // reset the flag shortly after (one native click will be suppressed)
+                                setTimeout(() => { justEndedDrag = false; }, 350);
+                                return;
                             }
                         }
                         dragging = false; dragPointerId = null; currentTarget = null;
                         try { if (e && e.pointerId) container.releasePointerCapture(e.pointerId); } catch (err) {}
                     }
+
+                    // Prevent accidental native clicks while dragging/long-pressing.
+                    // We use capture so we can stop the event before page navigation.
+                    container.addEventListener('click', (e) => {
+                        // If the user is actively dragging or a long-press timer is running,
+                        // suppress the click to avoid navigating mid-drag.
+                        if (dragging || dragTimer) {
+                            e.preventDefault();
+                            e.stopImmediatePropagation();
+                            return;
+                        }
+                        // If a drag just ended, block the browser-generated trusted click
+                        // but allow programmatic (isTrusted === false) clicks that we
+                        // triggered intentionally via `element.click()` above.
+                        if (justEndedDrag && e.isTrusted) {
+                            e.preventDefault();
+                            e.stopImmediatePropagation();
+                            justEndedDrag = false;
+                            return;
+                        }
+                    }, { capture: true });
 
                     container.addEventListener('pointerup', (e) => { endDrag(e); }, { passive: true });
                     container.addEventListener('pointercancel', (e) => { endDrag(e); }, { passive: true });
