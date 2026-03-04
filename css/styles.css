@@ -577,37 +577,6 @@ strong {
     padding-bottom: 48px;
 }
 
-/* Mobile override: fix the index hero to a consistent height so browser UI
-   (search bars, address bar overlays) doesn't change layout and push
-   the buttons around. Targets the main #hero section on narrow viewports. */
-@media (max-width: 700px) {
-    #hero.hero {
-        /* Use a fixed, generous height matching the desired mobile design */
-        min-height: 720px !important;
-        height: 720px !important;
-        /* reduce top padding so the overlay sits in the expected place */
-        padding-top: 140px !important;
-        padding-bottom: 36px !important;
-        align-items: flex-start; /* allow overlay to be positioned from the top padding */
-    }
-
-    /* Keep the overlay positioned relative so it doesn't shift when the
-       browser chrome (search/URL bars) appears or disappears */
-    #hero .hero-overlay {
-        position: relative;
-        transform: none !important;
-        inset: auto !important;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        padding-top: 6px;
-        z-index: 4;
-    }
-
-    /* Slightly tighten spacing between title and buttons on narrow phones */
-    #hero .hero-overlay .container { gap: 8px; }
-}
 
 /* Page-specific hero adjustments: center overlay content and nudge down slightly
    so page-level heroes (like `ministries.html`) appear vertically centered
@@ -727,25 +696,6 @@ strong {
 
     /* Buttons align to the left edge on mobile */
     #what-we-believe .belief-buttons { justify-content: flex-start; }
-}
-
-/* Remove thin grey/top border that can appear on some mobile browsers after launch.
-   Force a white top border/background and remove any pseudo-element overlays
-   that may produce a thin visible line between sections on mobile. */
-@media (max-width: 700px) {
-    #what-we-believe {
-        background-color: #ffffff !important;
-        border-top: 2px solid #ffffff !important;
-        box-shadow: none !important;
-        -webkit-transform: translateZ(0);
-    }
-    #what-we-believe::before,
-    #what-we-believe::after,
-    #what-we-believe .hero-overlay::before,
-    #what-we-believe .hero-overlay::after {
-        display: none !important;
-        background: transparent !important;
-    }
 }
 
 /* Ensure the kicker stays on one straight line on narrow screens */
