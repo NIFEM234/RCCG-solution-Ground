@@ -1538,59 +1538,118 @@ document.addEventListener('DOMContentLoaded', function () {
         document.addEventListener('contextmenu', function(e) {
             if (!document.body.classList.contains('mobile-nav-open')) return;
             const target = e.target;
-            // if click was on a dropdown link it is handled above; otherwise close all
+            // if click was on a dropdown link it is handled above; otherwise close all dropdowns
             if (target.closest('.has-dropdown')) return;
-            closeAll();
+            const items = mainNav.querySelectorAll('.has-dropdown');
+            items.forEach(li => {
+                li.classList.remove('dropdown-open');
+                const t = li.querySelector('.submenu-toggle');
+                if (t) t.setAttribute('aria-expanded', 'false');
+            });
         });
 
-        // manage touch-hold and right-click for dropdowns
+        // Replace long-press with an explicit submenu toggle button (mobile).
+        // This inserts a small arrow button for each `.has-dropdown` item and
+        // toggles the submenu only when that button is pressed. The parent
+        // link remains a normal link and will navigate immediately on tap.
         (function() {
             const dropdownItems = mainNav.querySelectorAll('.has-dropdown');
-            let holdTimer = null;
+            if (!dropdownItems || !dropdownItems.length) return;
 
-            function closeAll() {
-                dropdownItems.forEach(li => li.classList.remove('dropdown-open'));
+            function closeAllDropdowns(except) {
+                dropdownItems.forEach(li => {
+                    if (li !== except) {
+                        li.classList.remove('dropdown-open');
+                        const t = li.querySelector('.submenu-toggle');
+                        if (t) t.setAttribute('aria-expanded', 'false');
+                    }
+                });
             }
 
             dropdownItems.forEach(li => {
                 const link = li.querySelector('a');
+                const dropdown = li.querySelector('.dropdown');
                 if (!link) return;
 
-                // handle right-click on desktop
+                // create a visible toggle button for the submenu (if not present)
+                if (!li.querySelector('.submenu-toggle')) {
+                    const toggle = document.createElement('button');
+                    toggle.type = 'button';
+                    toggle.className = 'submenu-toggle';
+                    toggle.setAttribute('aria-expanded', 'false');
+                    toggle.setAttribute('aria-label', 'Open submenu');
+                    toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+                    if (dropdown) li.insertBefore(toggle, dropdown);
+                    else link.insertAdjacentElement('afterend', toggle);
+
+                    // explicit open/close behavior: click toggles this submenu only
+                    toggle.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const isOpenNow = li.classList.contains('dropdown-open');
+                        if (isOpenNow) {
+                            li.classList.remove('dropdown-open');
+                            toggle.setAttribute('aria-expanded', 'false');
+                        } else {
+                            closeAllDropdowns(li);
+                            li.classList.add('dropdown-open');
+                            toggle.setAttribute('aria-expanded', 'true');
+                        }
+                        // remove focus to avoid accidental keyboard re-triggers
+                        try { toggle.blur(); } catch (err) {}
+                    });
+
+                    // pointerdown prevents the browser from treating the action as a press-hold
+                    toggle.addEventListener('pointerdown', function(e) { e.preventDefault(); });
+
+                    toggle.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            this.click();
+                        } else if (e.key === 'Escape') {
+                            li.classList.remove('dropdown-open');
+                            toggle.setAttribute('aria-expanded', 'false');
+                        }
+                    });
+                }
+
+                // Keep contextmenu on desktop for convenience (right-click to open submenu)
                 link.addEventListener('contextmenu', e => {
                     e.preventDefault();
-                    // if already open, close
                     if (li.classList.contains('dropdown-open')) {
                         li.classList.remove('dropdown-open');
+                        const t = li.querySelector('.submenu-toggle');
+                        if (t) t.setAttribute('aria-expanded', 'false');
                     } else {
-                        closeAll();
+                        closeAllDropdowns(li);
                         li.classList.add('dropdown-open');
+                        const t = li.querySelector('.submenu-toggle');
+                        if (t) t.setAttribute('aria-expanded', 'true');
                     }
                 });
 
-                // touch/press hold logic
-                link.addEventListener('pointerdown', e => {
-                    if (e.pointerType === 'mouse' && e.button !== 0) return;
-                    holdTimer = setTimeout(() => {
-                        closeAll();
-                        li.classList.add('dropdown-open');
-                    }, 350);
-                });
-
-                link.addEventListener('pointerup', () => {
-                    clearTimeout(holdTimer);
-                });
-                link.addEventListener('pointerleave', () => {
-                    clearTimeout(holdTimer);
-                });
-
-                // if user taps another link, close others
-                link.addEventListener('pointerdown', () => {
-                    dropdownItems.forEach(other => {
-                        if (other !== li) other.classList.remove('dropdown-open');
-                    });
+                // Ensure tapping the parent link navigates immediately; if the
+                // mobile sheet is open remove the class so the sheet hides.
+                link.addEventListener('click', function() {
+                    if (document.body.classList.contains('mobile-nav-open')) {
+                        document.body.classList.remove('mobile-nav-open');
+                        const navToggleBtn = document.getElementById('nav-toggle');
+                        if (navToggleBtn) navToggleBtn.setAttribute('aria-expanded', 'false');
+                    }
                 });
             });
+
+            // Close dropdowns when menu is closed (global click handler above will remove the sheet)
+            document.addEventListener('click', function() {
+                if (!document.body.classList.contains('mobile-nav-open')) {
+                    dropdownItems.forEach(li => {
+                        li.classList.remove('dropdown-open');
+                        const t = li.querySelector('.submenu-toggle');
+                        if (t) t.setAttribute('aria-expanded', 'false');
+                    });
+                }
+            }, { capture: true });
         })();
 
         // close menu on resize to large screens

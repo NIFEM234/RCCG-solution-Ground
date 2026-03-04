@@ -280,6 +280,13 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             backdrop-filter: blur(24px) saturate(200%);
         }
+        /* make the overall pill container translucent on mobile (more glassy) */
+        .mobile-bottom-nav .mbn-container {
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.28);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
         .mobile-bottom-nav .mbn-gloss::before {
             /* remove inner blur/gradient for cleaner look */
             background: transparent;
