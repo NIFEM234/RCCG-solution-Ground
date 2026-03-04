@@ -2078,13 +2078,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         // add extra padding so the highlight extends past the icon
                         const rawWidth = Math.round(iRect.width + 24);
                         // allow a wider range on mobile for a more pill‑like shape
-                        // slightly increase min/max so the blob appears chunkier on phones
-                        const glossWidth = Math.max(68, Math.min(140, rawWidth - inset));
+                        const glossWidth = Math.max(60, Math.min(120, rawWidth - inset));
                         gloss.style.width = glossWidth + 'px';
                         const containerHeight = container.clientHeight || 58;
                         // gloss height is half the container, satisfying the tip ratio
                         let glossHeight = Math.round(containerHeight / 2);
-                        // bump height more on small screens so the white blob is noticeably larger
+                        // bump height a bit more on small screens for a chunkier blob
+                        // (increased multiplier to make blob more prominent on phones)
                         if (window.innerWidth < 700) {
                             glossHeight = Math.round(glossHeight * 1.35);
                         }
@@ -2257,7 +2257,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             try { container.setPointerCapture(dragPointerId); } catch (err) {}
                             currentTarget = placeGlossAtPoint(e.clientX, true);
                             if (currentTarget) currentTarget.classList.add('mbn-gloss-target');
-                        }, 666);
+                        }, 140);
                     }, { passive: true });
 
                     container.addEventListener('pointermove', (e) => {
