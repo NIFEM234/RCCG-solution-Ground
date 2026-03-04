@@ -1805,6 +1805,74 @@ document.addEventListener('DOMContentLoaded', function () {
 
         window.addEventListener('scroll', onUserScroll, { passive: true });
     });
+
+    // Keyboard-aware shifting: lift chat window and bottom nav when virtual keyboard opens
+    document.addEventListener('DOMContentLoaded', function () {
+        try {
+            const root = document.documentElement;
+            const nav = document.querySelector('.mobile-bottom-nav');
+            const chatWindow = document.getElementById('chat-window');
+            // Nothing to do if neither element exists
+            if (!nav && !chatWindow) return;
+
+            let lastKb = 0;
+            let rafPending = false;
+
+            function getKeyboardHeight() {
+                // Prefer Visual Viewport API when available
+                if (window.visualViewport) {
+                    const vv = window.visualViewport;
+                    const layoutH = window.innerHeight || document.documentElement.clientHeight;
+                    // Compute overlap between layout viewport and visual viewport
+                    const kb = Math.max(0, Math.round(layoutH - vv.height - (vv.offsetTop || 0)));
+                    // On some iOS builds offsetTop reports the keyboard height directly
+                    if (kb === 0 && (vv.offsetTop || 0) > 0) return vv.offsetTop;
+                    return kb;
+                }
+                // Fallback: no reliable info, assume zero (we only react when visualViewport exists)
+                return 0;
+            }
+
+            function applyShift() {
+                if (rafPending) return;
+                rafPending = true;
+                requestAnimationFrame(() => {
+                    try {
+                        const kb = getKeyboardHeight();
+                        // Ignore tiny fluctuations
+                        if (Math.abs(kb - lastKb) < 6) return;
+                        lastKb = kb;
+                        // set CSS var used by responsive transforms (px)
+                        root.style.setProperty('--kb-offset', kb ? (kb + 'px') : '0px');
+                        // optional class for styling if needed
+                        if (kb > 20) root.classList.add('kb-open'); else root.classList.remove('kb-open');
+                    } finally { rafPending = false; }
+                });
+            }
+
+            // Listen for viewport changes (keyboard opens/closes)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', applyShift);
+                window.visualViewport.addEventListener('scroll', applyShift);
+            }
+
+            // fallbacks
+            window.addEventListener('resize', applyShift);
+            window.addEventListener('orientationchange', applyShift);
+
+            // Trigger when inputs focus (keyboard likely to open)
+            document.addEventListener('focusin', (e) => {
+                const t = e.target;
+                if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) {
+                    setTimeout(applyShift, 120);
+                }
+            });
+            document.addEventListener('focusout', () => { setTimeout(applyShift, 200); });
+
+            // Initial check shortly after load
+            setTimeout(applyShift, 160);
+        } catch (err) { /* graceful degrade */ }
+    });
 });
 
 /* 3D rotatable history logo initializer
@@ -2495,5 +2563,73 @@ document.addEventListener('DOMContentLoaded', function() {
                 else footer.appendChild(p);
             });
         } catch (e) { /* graceful degrade */ }
+    });
+
+    // Keyboard-aware shifting: lift chat window and bottom nav when virtual keyboard opens
+    document.addEventListener('DOMContentLoaded', function () {
+        try {
+            const root = document.documentElement;
+            const nav = document.querySelector('.mobile-bottom-nav');
+            const chatWindow = document.getElementById('chat-window');
+            // Nothing to do if neither element exists
+            if (!nav && !chatWindow) return;
+
+            let lastKb = 0;
+            let rafPending = false;
+
+            function getKeyboardHeight() {
+                // Prefer Visual Viewport API when available
+                if (window.visualViewport) {
+                    const vv = window.visualViewport;
+                    const layoutH = window.innerHeight || document.documentElement.clientHeight;
+                    // Compute overlap between layout viewport and visual viewport
+                    const kb = Math.max(0, Math.round(layoutH - vv.height - (vv.offsetTop || 0)));
+                    // On some iOS builds offsetTop reports the keyboard height directly
+                    if (kb === 0 && (vv.offsetTop || 0) > 0) return vv.offsetTop;
+                    return kb;
+                }
+                // Fallback: no reliable info, assume zero (we only react when visualViewport exists)
+                return 0;
+            }
+
+            function applyShift() {
+                if (rafPending) return;
+                rafPending = true;
+                requestAnimationFrame(() => {
+                    try {
+                        const kb = getKeyboardHeight();
+                        // Ignore tiny fluctuations
+                        if (Math.abs(kb - lastKb) < 6) return;
+                        lastKb = kb;
+                        // set CSS var used by responsive transforms (px)
+                        root.style.setProperty('--kb-offset', kb ? (kb + 'px') : '0px');
+                        // optional class for styling if needed
+                        if (kb > 20) root.classList.add('kb-open'); else root.classList.remove('kb-open');
+                    } finally { rafPending = false; }
+                });
+            }
+
+            // Listen for viewport changes (keyboard opens/closes)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', applyShift);
+                window.visualViewport.addEventListener('scroll', applyShift);
+            }
+
+            // fallbacks
+            window.addEventListener('resize', applyShift);
+            window.addEventListener('orientationchange', applyShift);
+
+            // Trigger when inputs focus (keyboard likely to open)
+            document.addEventListener('focusin', (e) => {
+                const t = e.target;
+                if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) {
+                    setTimeout(applyShift, 120);
+                }
+            });
+            document.addEventListener('focusout', () => { setTimeout(applyShift, 200); });
+
+            // Initial check shortly after load
+            setTimeout(applyShift, 160);
+        } catch (err) { /* graceful degrade */ }
     });
 
