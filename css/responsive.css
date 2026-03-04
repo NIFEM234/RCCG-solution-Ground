@@ -231,7 +231,8 @@
        as needed (6px -> 8px etc). */
     @media (max-width: 420px) {
         .mobile-bottom-nav .mbn-fab {
-            right: calc(-1 * var(--mbn-container-h, 72px) - 6px);
+            /* Move closer to the pill so it doesn't touch the screen edge */
+            right: calc(-1 * var(--mbn-container-h, 72px) + 12px);
         }
     }
 
@@ -378,19 +379,18 @@
     .mobile-bottom-nav .mbn-container {
         display: flex;
         flex-direction: column;
-        gap: 16px; /* more space between stacked items */
-        padding: 12px; /* larger internal padding for bigger pill */
+        gap: 16px;
+        padding: 12px;
         align-items: center;
         justify-content: center;
         height: 100%;
         width: 100%;
-          /* Slightly more transparent, mobile-like gradient so the pill reads lighter
-              and lets the page color subtly show through. Keep a soft outer shadow. */
-          background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(245,245,245,0.74));
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
-          box-shadow: 0 18px 40px rgba(8,20,40,0.06), inset 0 6px 14px rgba(255,255,255,0.5);
-          border: none;
+        /* Match the mobile pill translucency: a soft translucent white with blur and a subtle rim */
+        background: rgba(255,255,255,0.18);
+        border: 1px solid rgba(255,255,255,0.28);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 18px 40px rgba(8,20,40,0.06);
     }
 
     /* Keep each item visually identical but stacked vertically */
