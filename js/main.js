@@ -1307,6 +1307,51 @@ document.addEventListener('DOMContentLoaded', function () {
         const messages = document.getElementById('chat-messages');
         if (!toggle || !windowEl || !form || !input || !messages) return;
 
+        // Mobile FAB clone: keep a copy of the chatbot FAB above the chat panel
+        // when the chat window is open so the icon remains visible and tappable.
+        let _fabClone = null;
+        let _fabCloneResizeHandler = null;
+        function isMobileWidth() { return window.matchMedia('(max-width: 999px)').matches; }
+        function positionFabClone() {
+            if (!_fabClone) return;
+            const orig = document.querySelector('.mobile-bottom-nav .mbn-fab') || document.querySelector('.mbn-fab');
+            if (!orig) return;
+            const rect = orig.getBoundingClientRect();
+            const right = Math.round(document.documentElement.clientWidth - rect.right);
+            const bottom = Math.round(window.innerHeight - rect.bottom);
+            _fabClone.style.right = (right >= 0 ? right : 12) + 'px';
+            _fabClone.style.bottom = (bottom >= 0 ? bottom : 16) + 'px';
+            _fabClone.style.width = rect.width + 'px';
+            _fabClone.style.height = rect.height + 'px';
+        }
+        function ensureFabCloneVisible() {
+            if (!isMobileWidth()) return;
+            if (_fabClone) { positionFabClone(); return; }
+            const orig = document.querySelector('.mobile-bottom-nav .mbn-fab') || document.querySelector('.mbn-fab');
+            if (!orig) return;
+            _fabClone = orig.cloneNode(true);
+            _fabClone.classList.add('mbn-fab-clone');
+            _fabClone.removeAttribute('id');
+            // remove ids inside clone to avoid duplicates
+            _fabClone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+            _fabClone.style.position = 'fixed';
+            _fabClone.style.transform = 'none';
+            _fabClone.style.zIndex = '1605';
+            _fabClone.style.pointerEvents = 'auto';
+            _fabClone.style.boxShadow = '0 14px 36px rgba(3,18,40,0.24)';
+            // clicking clone toggles the chat just like the original FAB
+            _fabClone.addEventListener('click', (e) => { e.stopPropagation(); const hidden = windowEl.getAttribute('aria-hidden') === 'true'; if (hidden) openChat(); else closeChat(); });
+            document.body.appendChild(_fabClone);
+            positionFabClone();
+            _fabCloneResizeHandler = () => positionFabClone();
+            window.addEventListener('resize', _fabCloneResizeHandler);
+            if (window.visualViewport) window.visualViewport.addEventListener('resize', _fabCloneResizeHandler);
+        }
+        function removeFabClone() {
+            if (_fabClone) { _fabClone.remove(); _fabClone = null; }
+            if (_fabCloneResizeHandler) { window.removeEventListener('resize', _fabCloneResizeHandler); if (window.visualViewport) window.visualViewport.removeEventListener('resize', _fabCloneResizeHandler); _fabCloneResizeHandler = null; }
+        }
+
         // ---- Simple persistent memory (localStorage) ----
         const MEM_KEY = 'sg_assistant_memory_v1';
         function loadMemory() {
@@ -1411,17 +1456,34 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         function openChat() {
-            windowEl.classList.remove('closing'); windowEl.setAttribute('aria-hidden', 'false'); windowEl.classList.add('opening');
+            windowEl.classList.remove('closing');
+            windowEl.setAttribute('aria-hidden', 'false');
+            windowEl.classList.add('opening');
+            // Ensure the FAB clone is visible above the chat on mobile
+            ensureFabCloneVisible();
             if (!messages.children.length) {
                 const last = memory.recent && memory.recent[0];
                 if (last) appendMessage({ text: `Welcome back — you last asked: "${escapeHtml(last)}". How can I help further?`, quickReplies: [{ label: 'Service times', href: 'new-here.html#what-to-expect' }, { label: 'Find us', href: '#find-us' }] });
                 else appendMessage('Hi — I can answer questions about this site. Try: location, services, ministries, contact.');
             }
             const onEnd = (e) => { if (e.target !== windowEl) return; windowEl.classList.remove('opening'); windowEl.removeEventListener('animationend', onEnd); };
-            windowEl.addEventListener('animationend', onEnd); input.focus();
+            windowEl.addEventListener('animationend', onEnd);
+            input.focus();
         }
 
-        function closeChat() { windowEl.classList.remove('opening'); windowEl.classList.add('closing'); const onEnd = (e) => { if (e.target !== windowEl) return; windowEl.classList.remove('closing'); windowEl.setAttribute('aria-hidden', 'true'); windowEl.removeEventListener('animationend', onEnd); }; windowEl.addEventListener('animationend', onEnd); }
+        function closeChat() {
+            windowEl.classList.remove('opening');
+            windowEl.classList.add('closing');
+            const onEnd = (e) => {
+                if (e.target !== windowEl) return;
+                windowEl.classList.remove('closing');
+                windowEl.setAttribute('aria-hidden', 'true');
+                // remove the FAB clone we created for mobile so it doesn't persist
+                removeFabClone();
+                windowEl.removeEventListener('animationend', onEnd);
+            };
+            windowEl.addEventListener('animationend', onEnd);
+        }
 
         toggle.addEventListener('click', () => { const hidden = windowEl.getAttribute('aria-hidden') === 'true'; if (hidden) openChat(); else closeChat(); }); closeBtn.addEventListener('click', closeChat);
 
