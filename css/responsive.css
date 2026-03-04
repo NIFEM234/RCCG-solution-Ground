@@ -104,7 +104,10 @@
 /* compact centered pill */
 /* narrower compact pill */
 .mobile-bottom-nav { display: block; position: fixed; left: 50%; transform: translateX(calc(-50% - 32px)) translateY(120%); /* slight rightward adjustment */
-    bottom: 18px; z-index: 1100; width: min(300px, calc(100% - 64px)); max-width: 300px; pointer-events: none; opacity: 0; transition: transform 360ms cubic-bezier(.22,.9,.32,1), opacity 220ms ease; }
+    bottom: 18px; z-index: 1100; width: min(300px, calc(100% - 64px)); max-width: 300px; pointer-events: none; opacity: 0; transition: transform 360ms cubic-bezier(.22,.9,.32,1), opacity 220ms ease;
+    /* expose container height as a variable so siblings (FAB) can match it */
+    --mbn-container-h: 72px;
+}
     .mobile-bottom-nav.mbn-visible { transform: translateX(calc(-50% - 32px)) translateY(0); opacity: 1; pointer-events: auto; }
     /* tighten container padding so highlights sit closer to pill edges
        and use variables so the relationship between container height,
@@ -121,9 +124,10 @@
         padding: calc(var(--mbn-container-h) / 4) calc(var(--mbn-container-h) / 4);
         position:relative;
         overflow: hidden;
-        /* Use a solid white background to avoid a faint grey line on mobile */
+        /* Use a soft translucent background so the pill reads glassy on varied content */
         background: #ffffff;
-        border: 1px solid rgba(0,0,0,0.04);
+        /* make the pill outline a subtle translucent white rather than a dark hairline */
+        border: 1px solid rgba(255,255,255,0.22);
         border-radius: calc(var(--mbn-container-h) / 2);
         /* softer outer shadow, remove bright inner highlights that can show as grey */
         box-shadow: 0 18px 40px rgba(8,20,40,0.06);
@@ -204,11 +208,11 @@
     /* FAB fully detached to the right with clear gap */
     /* FAB fully detached to the right with clear gap - blue chatbot style */
     /* Make the mobile FAB visually match the desktop chat icon: solid dark-blue circle with white face */
-    .mobile-bottom-nav .mbn-fab { position: absolute; right: -68px; top: 50%; transform: translateY(200%); border-radius: 999px; width:60px; height:60px; display:flex; align-items:center; justify-content:center; border:none; cursor:pointer; box-shadow: 0 14px 36px rgba(3,18,40,0.24); background-color: var(--brand-blue-dark); color:#fff; font-size:20px; font-weight:700; transition: transform 240ms cubic-bezier(.2,.9,.3,1), box-shadow 220ms ease, opacity 220ms ease; opacity:0; pointer-events:none; }
+    .mobile-bottom-nav .mbn-fab { position: absolute; right: calc(-1 * var(--mbn-container-h, 72px) - 12px); top: 50%; transform: translateY(200%); border-radius: 999px; width: var(--mbn-container-h, 72px); height: var(--mbn-container-h, 72px); display:flex; align-items:center; justify-content:center; border:none; cursor:pointer; box-shadow: 0 14px 36px rgba(3,18,40,0.24); background-color: var(--brand-blue-dark); color:#fff; font-size:20px; font-weight:700; transition: transform 240ms cubic-bezier(.2,.9,.3,1), box-shadow 220ms ease, opacity 220ms ease; opacity:0; pointer-events:none; }
     .mobile-bottom-nav.mbn-visible .mbn-fab { transform: translateY(-50%); opacity:1; pointer-events:auto; }
     /* remove the glossy overlay that created extra rings so the icon looks flat like desktop */
     .mobile-bottom-nav .mbn-fab::after { display:none; }
-    .mobile-bottom-nav .mbn-fab svg { display:block; width:36px; height:36px; transform-origin:50% 50%; animation: chat-toggle-breathe 6s ease-in-out infinite; }
+    .mobile-bottom-nav .mbn-fab svg { display:block; width: calc(var(--mbn-container-h, 72px) * 0.6); height: calc(var(--mbn-container-h, 72px) * 0.6); transform-origin:50% 50%; animation: chat-toggle-breathe 6s ease-in-out infinite; }
     .mobile-bottom-nav .mbn-fab svg .fab-bg { fill: var(--brand-blue-dark); }
     .mobile-bottom-nav .mbn-fab svg .fab-face { fill: #fff; }
     .mobile-bottom-nav .mbn-fab svg .fab-eye { fill: var(--brand-blue-dark); transform-origin:50% 50%; transform-box: fill-box; animation: chat-eye-blink 5s steps(1,start) infinite; }
@@ -498,3 +502,40 @@
     opacity: 0 !important;
     pointer-events: none !important;
 }
+
+/* ---------- Bottom-nav visual tweaks ---------- */
+/* Make bottom-nav icons bolder and slightly larger for better legibility */
+.mobile-bottom-nav .mbn-item svg { width: 20px !important; height: 20px !important; }
+.mobile-bottom-nav .mbn-item svg path,
+.mobile-bottom-nav .mbn-item svg circle,
+.mobile-bottom-nav .mbn-item svg line,
+.mobile-bottom-nav .mbn-item svg rect {
+    stroke-width: 1.9px !important;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Make the sliding gloss a solid white blob behind the icon only (not the pill)
+   and remove any darker shadow that appears while moving. */
+.mobile-bottom-nav .mbn-gloss {
+    /* subtle warm-grey tint so the white blob reads softer on bright backgrounds */
+    background: rgba(245,245,246,0.98) !important;
+    /* translucent white rim for the gloss to match the pill outline */
+    border: 1px solid rgba(255,255,255,0.24) !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+.mobile-bottom-nav .mbn-gloss::before {
+    background: transparent !important;
+    filter: none !important;
+}
+
+/* Specifically remove any extra shadow while the gloss is moving (JS toggles this class) */
+.mobile-bottom-nav .mbn-gloss.mbn-gloss-moving {
+    box-shadow: none !important;
+}
+
+/* Tame the per-item pseudo shadow while dragging so multiple shadows don't stack */
+.mobile-bottom-nav .mbn-item::before { box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important; }

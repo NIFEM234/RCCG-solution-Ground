@@ -3624,6 +3624,15 @@ body.contact-page .site-footer {
     pointer-events: auto;
 }
 
+/* If the mobile bottom-nav pill is visible, nudge the chat window up slightly
+   so there's clear spacing between the pill and the open chat panel. This
+   uses a fixed offset so the gap remains consistent across devices. */
+.mobile-bottom-nav.mbn-visible ~ .chat-window,
+.mobile-bottom-nav.mbn-visible ~ .chat-window.opening,
+.mobile-bottom-nav.mbn-visible ~ .chat-window[aria-hidden="false"] {
+    bottom: 110px;
+}
+
 /* Explicit open/close animations so the chat has a friendly entrance */
 .chat-window.opening {
     animation: chat-open 260ms cubic-bezier(.2,.9,.24,1) both;
@@ -3720,6 +3729,8 @@ body.contact-page .site-footer {
 @media (max-width:480px) {
     .chat-window { right:12px; left:auto; width:auto; bottom:84px; height:360px }
     .chat-toggle { right:12px; left:auto; }
+    /* ensure the chat panel sits above the mobile bottom pill when it's visible */
+    .mobile-bottom-nav.mbn-visible ~ .chat-window { bottom: 110px; }
 }
 
 /* Typing indicator for bot: three animated dots */
@@ -4162,6 +4173,9 @@ input[placeholder*="Search"] {
 
     /* chatbot should be touch-friendly and full-width near the bottom */
     .chat-window { right: 12px; left: auto; width: auto; bottom: 84px; height: 360px }
+
+    /* Ensure chat panel stays clear of the mobile bottom pill when it's visible */
+    .mobile-bottom-nav.mbn-visible ~ .chat-window { bottom: 110px; }
 
     /* back to top & chat toggle move slightly inward */
     .back-to-top { right: 12px; bottom: 16px }
