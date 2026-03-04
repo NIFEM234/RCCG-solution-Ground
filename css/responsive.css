@@ -230,9 +230,14 @@
        abut the screen edge (prevents touching the web 'wall'). Tweak value
        as needed (6px -> 8px etc). */
     @media (max-width: 420px) {
+        /* Increase horizontal gap between pill and FAB and keep FAB off the screen edge */
+        .mobile-bottom-nav {
+            /* small extra inset from viewport edge on tiny phones */
+            --mbn-fab-edge-inset: 10px;
+        }
         .mobile-bottom-nav .mbn-fab {
-            /* Move closer to the pill so it doesn't touch the screen edge */
-            right: calc(-1 * var(--mbn-container-h, 72px) + 12px);
+            /* place FAB just outside the pill but inset from the viewport by --mbn-fab-edge-inset */
+            right: calc(-1 * var(--mbn-container-h, 72px) + 24px - var(--mbn-fab-edge-inset));
         }
     }
 

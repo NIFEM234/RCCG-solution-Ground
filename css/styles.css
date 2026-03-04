@@ -3628,13 +3628,14 @@ body.contact-page .site-footer {
     opacity: 0;
     pointer-events: none;
     transition: opacity 200ms ease, transform 200ms ease, bottom 200ms ease;
-    z-index: 390;
+    z-index: 1400; /* ensure chat sits above bottom nav / FAB */
 }
 
 .chat-window[aria-hidden="false"] {
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
+    z-index: 1400;
 }
 
 /* If the mobile bottom-nav pill is visible, nudge the chat window up slightly
@@ -3655,14 +3656,14 @@ body.contact-page .site-footer {
 }
 
 @keyframes chat-open {
-    0% { transform: translateY(18px) scale(0.98); opacity: 0; }
-    60% { transform: translateY(-6px) scale(1.02); opacity: 1; }
-    100% { transform: translateY(0) scale(1); opacity: 1; }
+    0% { transform: translateY(18px); opacity: 0; }
+    60% { transform: translateY(-6px); opacity: 1; }
+    100% { transform: translateY(0); opacity: 1; }
 }
 
 @keyframes chat-close {
-    0% { transform: translateY(0) scale(1); opacity: 1; }
-    100% { transform: translateY(14px) scale(0.98); opacity: 0; }
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(14px); opacity: 0; }
 }
 
 .chat-header {
@@ -3810,6 +3811,8 @@ body.contact-page .site-footer {
         background: rgba(255,255,255,0.06);
         color: #fff;
         border: 1px solid rgba(255,255,255,0.12);
+        font-size: 16px;
+        -webkit-text-size-adjust: 100%;
     }
 
     .chat-input::placeholder { color: rgba(255,255,255,0.75); }
@@ -3817,7 +3820,7 @@ body.contact-page .site-footer {
     .chat-send { background: var(--brand-blue); color: #fff; }
 
     /* Ensure chat window sits above mobile nav and gloss */
-    .chat-window { z-index: 1200; }
+    .chat-window { z-index: 1400; -webkit-text-size-adjust: 100%; }
 }
 
 /* Mobile / Phone specific optimizations */
