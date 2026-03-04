@@ -3132,7 +3132,8 @@ body.contact-page .site-footer {
 }
 
 @media (max-width:900px) {
-    .feature-carousel { min-height: 420px; padding-right: 14px }
+    /* Reduce carousel height on tablets and smaller so slides feel more landscape */
+    .feature-carousel { min-height: 260px; aspect-ratio: 16/9; padding-right: 14px; }
     /* on small screens keep indicators inside the image to avoid overflow */
     .feature-carousel-indicators { right: 10px; gap:8px }
     /* special case for children overview: carousel should be full width and centred */
@@ -3141,6 +3142,14 @@ body.contact-page .site-footer {
         display: flex;
         justify-content: center;
     }
+}
+
+@media (max-width:480px) {
+    /* Phones: make slides noticeably more landscape (shorter height) */
+    .feature-carousel { min-height: 180px; aspect-ratio: 16/9; padding-right: 8px; }
+    .feature-carousel .feature-slide { background-position: center; }
+    /* ensure inline images inside feature-img also respect the smaller height */
+    .feature-img img { max-height: 180px; object-fit: cover; border-radius: 12px; }
 }
 
 /* For reversed feature blocks (image on left), place indicators on the left side */
