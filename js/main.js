@@ -1339,10 +1339,16 @@ document.addEventListener('DOMContentLoaded', function () {
             _fabClone.style.zIndex = '1605';
             _fabClone.style.pointerEvents = 'auto';
             _fabClone.style.boxShadow = '0 14px 36px rgba(3,18,40,0.24)';
+            // Avoid clone inheriting transitions from original — position it instantly
+            _fabClone.style.transition = 'none';
+            _fabClone.style.willChange = 'auto';
             // clicking clone toggles the chat just like the original FAB
             _fabClone.addEventListener('click', (e) => { e.stopPropagation(); const hidden = windowEl.getAttribute('aria-hidden') === 'true'; if (hidden) openChat(); else closeChat(); });
             document.body.appendChild(_fabClone);
+            // Position immediately, then again on next frame and after animations so transient layout shifts don't misplace it
             positionFabClone();
+            requestAnimationFrame(positionFabClone);
+            setTimeout(positionFabClone, 320);
             _fabCloneResizeHandler = () => positionFabClone();
             window.addEventListener('resize', _fabCloneResizeHandler);
             if (window.visualViewport) window.visualViewport.addEventListener('resize', _fabCloneResizeHandler);
@@ -1466,7 +1472,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (last) appendMessage({ text: `Welcome back — you last asked: "${escapeHtml(last)}". How can I help further?`, quickReplies: [{ label: 'Service times', href: 'new-here.html#what-to-expect' }, { label: 'Find us', href: '#find-us' }] });
                 else appendMessage('Hi — I can answer questions about this site. Try: location, services, ministries, contact.');
             }
-            const onEnd = (e) => { if (e.target !== windowEl) return; windowEl.classList.remove('opening'); windowEl.removeEventListener('animationend', onEnd); };
+            const onEnd = (e) => {
+                if (e.target !== windowEl) return;
+                windowEl.classList.remove('opening');
+                // ensure cloned FAB is exactly aligned after the chat opening animation
+                try { requestAnimationFrame(positionFabClone); setTimeout(positionFabClone, 40); } catch (err) { /* ignore */ }
+                windowEl.removeEventListener('animationend', onEnd);
+            };
             windowEl.addEventListener('animationend', onEnd);
             input.focus();
         }
@@ -1617,6 +1629,11 @@ document.addEventListener('DOMContentLoaded', function () {
         (function() {
             const dropdownItems = mainNav.querySelectorAll('.has-dropdown');
             if (!dropdownItems || !dropdownItems.length) return;
+            const submenuMediaQuery = window.matchMedia('(max-width: 700px)');
+
+            function isMobileSubmenuMode() {
+                return submenuMediaQuery.matches;
+            }
 
             function closeAllDropdowns(except) {
                 dropdownItems.forEach(li => {
@@ -1624,6 +1641,25 @@ document.addEventListener('DOMContentLoaded', function () {
                         li.classList.remove('dropdown-open');
                         const t = li.querySelector('.submenu-toggle');
                         if (t) t.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+
+            function syncSubmenuToggleMode() {
+                const mobileMode = isMobileSubmenuMode();
+                dropdownItems.forEach(li => {
+                    const t = li.querySelector('.submenu-toggle');
+                    if (!t) return;
+                    if (mobileMode) {
+                        t.disabled = false;
+                        t.removeAttribute('hidden');
+                        t.setAttribute('aria-hidden', 'false');
+                    } else {
+                        t.disabled = true;
+                        t.setAttribute('hidden', 'hidden');
+                        t.setAttribute('aria-hidden', 'true');
+                        li.classList.remove('dropdown-open');
+                        t.setAttribute('aria-expanded', 'false');
                     }
                 });
             }
@@ -1647,6 +1683,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // explicit open/close behavior: click toggles this submenu only
                     toggle.addEventListener('click', function(e) {
+                        if (!isMobileSubmenuMode()) return;
                         e.preventDefault();
                         e.stopPropagation();
                         const isOpenNow = li.classList.contains('dropdown-open');
@@ -1663,9 +1700,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
 
                     // pointerdown prevents the browser from treating the action as a press-hold
-                    toggle.addEventListener('pointerdown', function(e) { e.preventDefault(); });
+                    toggle.addEventListener('pointerdown', function(e) {
+                        if (!isMobileSubmenuMode()) return;
+                        e.preventDefault();
+                    });
 
                     toggle.addEventListener('keydown', function(e) {
+                        if (!isMobileSubmenuMode()) return;
                         if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
                             this.click();
@@ -1675,21 +1716,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     });
                 }
-
-                // Keep contextmenu on desktop for convenience (right-click to open submenu)
-                link.addEventListener('contextmenu', e => {
-                    e.preventDefault();
-                    if (li.classList.contains('dropdown-open')) {
-                        li.classList.remove('dropdown-open');
-                        const t = li.querySelector('.submenu-toggle');
-                        if (t) t.setAttribute('aria-expanded', 'false');
-                    } else {
-                        closeAllDropdowns(li);
-                        li.classList.add('dropdown-open');
-                        const t = li.querySelector('.submenu-toggle');
-                        if (t) t.setAttribute('aria-expanded', 'true');
-                    }
-                });
 
                 // Ensure tapping the parent link navigates immediately; if the
                 // mobile sheet is open remove the class so the sheet hides.
@@ -1712,6 +1738,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                 }
             }, { capture: true });
+
+            // Enforce: submenu icon and its toggle behavior are mobile-only.
+            syncSubmenuToggleMode();
+            window.addEventListener('resize', syncSubmenuToggleMode);
         })();
 
         // close menu on resize to large screens
