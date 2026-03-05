@@ -863,8 +863,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const _pathName = (window.location.pathname || '').split('/').pop() || '';
         const _path = _pathName.toLowerCase();
         const desktopAlwaysOn = (window.innerWidth >= 1000) && !(_path === '' || _path === 'index.html');
-        // mobile always-on pages list: show pill on all pages linked by the 4 nav icons
-        const mobileAlwaysOn = (window.innerWidth < 1000) && (_path === '' || _path === 'index.html' || _path === 'ministries.html' || _path === 'location.html' || _path === 'contact.html' || _path === 'give.html');
+        // mobile always-on pages list
+        const mobileAlwaysOn = (_path === 'contact.html' || _path === 'give.html');
         function setBottomNavVisible(visible) {
             if (!mbn && !mbnFab) return;
             // always show on desktop non-home pages
