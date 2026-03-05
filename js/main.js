@@ -659,11 +659,15 @@ document.addEventListener('DOMContentLoaded', function () {
     (function () {
         const cards = document.querySelectorAll('.flip-card');
         cards.forEach(card => {
+            let flipCooldown = false;
             card.addEventListener('click', (e) => {
                 // only toggle on narrow viewports so desktop hover still works
-                if (window.matchMedia('(max-width: 700px)').matches) {
-                    card.classList.toggle('flipped');
-                }
+                if (!window.matchMedia('(max-width: 700px)').matches) return;
+                if (flipCooldown) return;
+                flipCooldown = true;
+                card.classList.toggle('flipped');
+                // prevent rapid re-toggling from double-tap or touch event race
+                setTimeout(() => { flipCooldown = false; }, 400);
             });
         });
     })();

@@ -624,7 +624,7 @@ strong {
 }
 
 @media (max-width: 560px) {
-    #what-we-believe.hero { height: 260px; min-height: 220px; padding-top: 28px; padding-bottom: 28px }
+    #what-we-believe.hero { height: auto; min-height: 220px; padding-top: 28px; padding-bottom: 28px }
     #what-we-believe .hero-title { font-size: 28px }
 }
 
@@ -639,12 +639,12 @@ strong {
         position: relative;
         padding-top: 0; /* allow overlay to control spacing */
         padding-bottom: 0;
+        height: auto;
         min-height: 280px;
     }
 
     #what-we-believe .hero-overlay {
-        position: absolute;
-        inset: 0;
+        position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -2646,20 +2646,19 @@ body.contact-page .site-footer {
     transition: transform 0.8s ease-in-out;
 }
 
-.flip-card:hover img {
-    transform: rotateY(180deg);
-}
-
-.flip-card:hover .flip-card-back {
-    transform: rotateY(360deg);
-}
-
-/* mobile-specific: disable hover transforms and support persistent flip via class */
-@media (max-width: 700px) {
-    .flip-card:hover img,
-    .flip-card:hover .flip-card-back {
-        transform: none !important;
+/* Only apply hover flip on devices that truly support hover (mouse/trackpad) */
+@media (hover: hover) and (pointer: fine) {
+    .flip-card:hover img {
+        transform: rotateY(180deg);
     }
+
+    .flip-card:hover .flip-card-back {
+        transform: rotateY(360deg);
+    }
+}
+
+/* mobile-specific: support persistent flip via class */
+@media (max-width: 700px) {
     .flip-card.flipped img {
         transform: rotateY(180deg) !important;
     }
