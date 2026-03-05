@@ -1590,7 +1590,8 @@ body.contact-page .site-footer {
 /* shrink carousel height on narrow screens */
 @media (max-width: 600px) {
     .feature-carousel {
-        height: 360px !important; /* override inline 800px */
+        height: auto !important;
+        max-height: 260px;
     }
     /* give sections breathing room on very narrow screens */
     .section .container {
@@ -2363,6 +2364,7 @@ body.contact-page .site-footer {
    on small screens by increasing bottom padding to accommodate them. */
 @media (max-width: 700px) {
     .site-footer {
+        padding-top: 64px;
         padding-bottom: calc(var(--mbn-container-h, 72px) + 64px);
     }
 }
@@ -2966,7 +2968,8 @@ body.contact-page .site-footer {
     /* keep carousel frames wide even on phones */
     .feature-carousel {
         aspect-ratio: 16/9;
-        min-height: 250px;
+        min-height: 200px;
+        max-height: 280px;
     }
 }
 
