@@ -9,14 +9,9 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             if (slide.dataset && slide.dataset.bg && !slide.dataset.bgLoaded) {
                 const src = slide.dataset.bg;
-                const img = new Image();
-                img.src = src;
-                img.onload = function () {
-                    slide.style.backgroundImage = "url('" + src + "')";
-                    slide.dataset.bgLoaded = '1';
-                };
-                // If image fails, still mark as attempted to avoid retry loops
-                img.onerror = function () { slide.dataset.bgLoaded = '1'; };
+                // Apply immediately so the first hero frame is not blank while waiting for onload.
+                slide.style.backgroundImage = "url('" + src + "')";
+                slide.dataset.bgLoaded = '1';
             }
         } catch (e) { /* ignore */ }
     }
@@ -28,12 +23,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!el || el.dataset.bgLoaded) return;
             const src = el.dataset.bg;
             if (!src) return;
-            const img = new Image();
-            img.onload = ()=>{
-                el.style.backgroundImage = `url('${src}')`;
-                el.dataset.bgLoaded = 'true';
-            };
-            img.src = src;
+            // Set background right away to avoid visible placeholder flashes.
+            el.style.backgroundImage = `url('${src}')`;
+            el.dataset.bgLoaded = 'true';
         };
 
         const io = new IntersectionObserver((entries, obs)=>{
@@ -1307,57 +1299,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const messages = document.getElementById('chat-messages');
         if (!toggle || !windowEl || !form || !input || !messages) return;
 
-        // Mobile FAB clone: keep a copy of the chatbot FAB above the chat panel
-        // when the chat window is open so the icon remains visible and tappable.
-        let _fabClone = null;
-        let _fabCloneResizeHandler = null;
-        function isMobileWidth() { return window.matchMedia('(max-width: 999px)').matches; }
-        function positionFabClone() {
-            if (!_fabClone) return;
-            const orig = document.querySelector('.mobile-bottom-nav .mbn-fab') || document.querySelector('.mbn-fab');
-            if (!orig) return;
-            const rect = orig.getBoundingClientRect();
-            const right = Math.round(document.documentElement.clientWidth - rect.right);
-            const bottom = Math.round(window.innerHeight - rect.bottom);
-            _fabClone.style.right = (right >= 0 ? right : 12) + 'px';
-            _fabClone.style.bottom = (bottom >= 0 ? bottom : 16) + 'px';
-            _fabClone.style.width = rect.width + 'px';
-            _fabClone.style.height = rect.height + 'px';
-        }
-        function ensureFabCloneVisible() {
-            if (!isMobileWidth()) return;
-            if (_fabClone) { positionFabClone(); return; }
-            const orig = document.querySelector('.mobile-bottom-nav .mbn-fab') || document.querySelector('.mbn-fab');
-            if (!orig) return;
-            _fabClone = orig.cloneNode(true);
-            _fabClone.classList.add('mbn-fab-clone');
-            _fabClone.removeAttribute('id');
-            // remove ids inside clone to avoid duplicates
-            _fabClone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
-            _fabClone.style.position = 'fixed';
-            _fabClone.style.transform = 'none';
-            _fabClone.style.zIndex = '1605';
-            _fabClone.style.pointerEvents = 'auto';
-            _fabClone.style.boxShadow = '0 14px 36px rgba(3,18,40,0.24)';
-            // Avoid clone inheriting transitions from original — position it instantly
-            _fabClone.style.transition = 'none';
-            _fabClone.style.willChange = 'auto';
-            // clicking clone toggles the chat just like the original FAB
-            _fabClone.addEventListener('click', (e) => { e.stopPropagation(); const hidden = windowEl.getAttribute('aria-hidden') === 'true'; if (hidden) openChat(); else closeChat(); });
-            document.body.appendChild(_fabClone);
-            // Position immediately, then again on next frame and after animations so transient layout shifts don't misplace it
-            positionFabClone();
-            requestAnimationFrame(positionFabClone);
-            setTimeout(positionFabClone, 320);
-            _fabCloneResizeHandler = () => positionFabClone();
-            window.addEventListener('resize', _fabCloneResizeHandler);
-            if (window.visualViewport) window.visualViewport.addEventListener('resize', _fabCloneResizeHandler);
-        }
-        function removeFabClone() {
-            if (_fabClone) { _fabClone.remove(); _fabClone = null; }
-            if (_fabCloneResizeHandler) { window.removeEventListener('resize', _fabCloneResizeHandler); if (window.visualViewport) window.visualViewport.removeEventListener('resize', _fabCloneResizeHandler); _fabCloneResizeHandler = null; }
-        }
-
         // ---- Simple persistent memory (localStorage) ----
         const MEM_KEY = 'sg_assistant_memory_v1';
         function loadMemory() {
@@ -1465,8 +1406,6 @@ document.addEventListener('DOMContentLoaded', function () {
             windowEl.classList.remove('closing');
             windowEl.setAttribute('aria-hidden', 'false');
             windowEl.classList.add('opening');
-            // Ensure the FAB clone is visible above the chat on mobile
-            ensureFabCloneVisible();
             if (!messages.children.length) {
                 const last = memory.recent && memory.recent[0];
                 if (last) appendMessage({ text: `Welcome back — you last asked: "${escapeHtml(last)}". How can I help further?`, quickReplies: [{ label: 'Service times', href: 'new-here.html#what-to-expect' }, { label: 'Find us', href: '#find-us' }] });
@@ -1475,8 +1414,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const onEnd = (e) => {
                 if (e.target !== windowEl) return;
                 windowEl.classList.remove('opening');
-                // ensure cloned FAB is exactly aligned after the chat opening animation
-                try { requestAnimationFrame(positionFabClone); setTimeout(positionFabClone, 40); } catch (err) { /* ignore */ }
                 windowEl.removeEventListener('animationend', onEnd);
             };
             windowEl.addEventListener('animationend', onEnd);
@@ -1490,8 +1427,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (e.target !== windowEl) return;
                 windowEl.classList.remove('closing');
                 windowEl.setAttribute('aria-hidden', 'true');
-                // remove the FAB clone we created for mobile so it doesn't persist
-                removeFabClone();
                 windowEl.removeEventListener('animationend', onEnd);
             };
             windowEl.addEventListener('animationend', onEnd);
