@@ -3619,7 +3619,7 @@ body.contact-page .site-footer {
 .chat-window {
     position: fixed;
     left: 16px;
-    bottom: calc(92px + var(--kb-offset, 0px));
+    bottom: 92px;
     width: 320px;
     max-width: calc(100vw - 40px);
     height: 420px;
@@ -3653,7 +3653,7 @@ body.contact-page .site-footer {
 .mobile-bottom-nav.mbn-visible ~ .chat-window,
 .mobile-bottom-nav.mbn-visible ~ .chat-window.opening,
 .mobile-bottom-nav.mbn-visible ~ .chat-window[aria-hidden="false"] {
-    bottom: calc(110px + var(--kb-offset, 0px));
+    bottom: 110px;
 }
 
 /* Explicit open/close animations so the chat has a friendly entrance */
@@ -3750,10 +3750,10 @@ body.contact-page .site-footer {
 .chat-toggle:hover svg path[stroke="#1e73ff"] { animation-duration: 2s }
 
 @media (max-width:480px) {
-    .chat-window { right:12px; left:auto; width:auto; bottom: calc(84px + var(--kb-offset, 0px)); height:360px }
+    .chat-window { right:12px; left:auto; width:auto; bottom: 84px; height:360px }
     .chat-toggle { right:12px; left:auto; }
     /* ensure the chat panel sits above the mobile bottom pill when it's visible */
-    .mobile-bottom-nav.mbn-visible ~ .chat-window { bottom: calc(110px + var(--kb-offset, 0px)); }
+    .mobile-bottom-nav.mbn-visible ~ .chat-window { bottom: 110px; }
 }
 
 /* Typing indicator for bot: three animated dots */
@@ -4197,10 +4197,10 @@ input[placeholder*="Search"] {
     .map-card iframe { height: 220px }
 
     /* chatbot should be touch-friendly and full-width near the bottom */
-    .chat-window { right: 12px; left: auto; width: auto; bottom: calc(84px + var(--kb-offset, 0px)); height: 360px }
+    .chat-window { right: 12px; left: auto; width: auto; bottom: 84px; height: 360px }
 
     /* Ensure chat panel stays clear of the mobile bottom pill when it's visible */
-    .mobile-bottom-nav.mbn-visible ~ .chat-window { bottom: calc(110px + var(--kb-offset, 0px)); }
+    .mobile-bottom-nav.mbn-visible ~ .chat-window { bottom: 110px; }
 
     /* back to top & chat toggle move slightly inward */
     .back-to-top { right: 12px; bottom: 16px }
