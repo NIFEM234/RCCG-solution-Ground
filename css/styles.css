@@ -2670,10 +2670,9 @@ body.contact-page .site-footer {
 /* Mobile tweaks: reduce overseer image height and large shout text */
 @media (max-width: 700px) {
     .overseer-profile .profile-img {
-        max-height: 340px; /* reduce image container height on phones */
+        max-height: 400px;
         position: relative;
-        /* bring the photo up slightly if desired, but avoid drastic shift */
-        top: -80px;
+        top: 0;
         left: 0;
         z-index: 5;
     }
