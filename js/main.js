@@ -2528,3 +2528,20 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (e) { /* graceful degrade */ }
     });
 
+    // Client-side search for recorded live streams on the watch page
+    document.addEventListener('DOMContentLoaded', function () {
+        try {
+            const searchInput = document.getElementById('video-search');
+            const videoList = document.getElementById('video-list');
+            if (!searchInput || !videoList) return;
+
+            searchInput.addEventListener('input', function () {
+                const term = this.value.trim().toLowerCase();
+                videoList.querySelectorAll('.video-thumb').forEach(thumb => {
+                    const text = thumb.textContent.toLowerCase();
+                    thumb.style.display = term && !text.includes(term) ? 'none' : '';
+                });
+            });
+        } catch (e) { /* ignore */ }
+    });
+
