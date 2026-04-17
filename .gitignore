@@ -53,3 +53,20 @@ logs/
 *.sketch
 
 # Keep image, css, js and site content tracked (do NOT ignore img/ css/ js/)
+
+# API keys and secrets
+*.env
+*.key
+config.js
+
+# Sensitive files
+secrets.json
+credentials.json
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
