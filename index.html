@@ -228,32 +228,108 @@
             </div>
         </section>
 
-        <!-- Latest message / video section (matches card sizing & spacing) -->
         <section id="latest-message" class="section light">
-            <div class="container video-grid">
-                <div class="video-card">
-                    <!-- Clickable thumbnail that links to the live stream (opens in new tab) -->
-                    <a class="video-thumb" href="https://www.youtube.com/watch?v=exqjg--O_24" target="_blank"
-                        rel="noopener noreferrer">
-                        <img src="img/new live image March .jpeg" alt="Latest message thumbnail" loading="lazy">
-                        <span class="play-icon" aria-hidden="true"></span>
-                    </a>
-                </div>
+    <div class="container video-grid">
+        <a id="videoBox" class="video-card" target="_blank" rel="noopener noreferrer">
+            <img id="streamImage" 
+                 src="img/nextlive.jpg" 
+                 alt="Watch our live stream">
+            <span class="play-icon-overlay">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 3L19 12L5 21V3Z" fill="white" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+    </svg>
+</span>
+        </a>
+        <div class="video-info">
+            <p class="eyebrow">
+                <img class="eyebrow-badge" src="img/Solution ground LOGO.avif" alt="badge" loading="lazy">
+                <span>RECENT MESSAGE</span>
+            </p>
+            <h2 class="video-title">Catch the <span class="video-em">Latest Message</span></h2>
+            <p class="video-desc">Experience worship, hear a message of hope, and chat with others who are watching too. We'd love to see you there.</p>
+            <div class="divider" aria-hidden="true"></div>
+            <a href="https://www.youtube.com/@RCCGSolutionGroundKent/streams" class="btn btn-dark" target="_blank" rel="noopener noreferrer">CHECK OUT MORE MESSAGES</a>
+        </div>
+    </div>
+</section>
 
-                <div class="video-info">
-                    <p class="eyebrow">
-                        <img class="eyebrow-badge" src="img/Solution ground LOGO.avif" alt="badge" loading="lazy">
-                        <span>RECENT MESSAGE</span>
-                    </p>
-                    <h2 class="video-title">Catch the <span class="video-em">Latest Message</span></h2>
-                    <p class="video-desc">Experience worship, hear a message of hope, and chat with others who are
-                        watching too. We'd love to see you there.</p>
-                    <div class="divider" aria-hidden="true"></div>
-                    <a href="https://www.youtube.com/@RCCGSolutionGroundKent" class="btn btn-dark" target="_blank"
-                        rel="noopener noreferrer">CHECK OUT MORE MESSAGES</a>
-                </div>
-            </div>
-        </section>
+<style>
+    .video-card {
+        position: relative;
+        display: block;
+        width: 100%;
+        padding-bottom: 56.25%;
+        background: #000;
+        border-radius: 12px;
+        overflow: hidden;
+        text-decoration: none;
+    }
+    .video-card img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    .video-card:hover img {
+        transform: scale(1.02);
+    }
+    .play-icon-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 60px;
+        height: 60px;
+        background: rgba(0,0,0,0.6);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        color: white;
+        pointer-events: none;
+        z-index: 2;
+    }
+    .video-card:hover .play-icon-overlay {
+        background: rgba(255,0,0,0.8);
+    }
+</style>
+
+<script>
+    const CHANNEL_ID = 'UC482zR5rel3vAV5bAvUk1RQ';
+    const API_KEY = 'AIzaSyBZqx4HMCA8PqJI4pymEbx6Vzh5bBBgc0M';
+    const videoBox = document.getElementById('videoBox');
+    const streamImage = document.getElementById('streamImage');
+    let BASE_LIVE_URL = 'https://www.youtube.com/@RCCGSolutionGroundKent/streams';  // Your channel page
+let currentLiveVideoId = null;  // Will store the actual live video ID when you are streaming
+
+    async function updateLiveStatus() {
+        try {
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=live&type=video&key=${API_KEY}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            const isLive = (data.items && data.items.length > 0);
+            
+            if (isLive) {
+                streamImage.src = 'img/nowlive.jpg';
+                videoBox.href = BASE_LIVE_URL;
+            } else {
+                streamImage.src = 'img/nextlive.jpg';
+                videoBox.href = BASE_LIVE_URL;
+            }
+        } catch (error) {
+            console.log('Live check error:', error);
+            streamImage.src = 'img/nextlive.jpg';
+            videoBox.href = BASE_LIVE_URL;
+        }
+    }
+    
+    updateLiveStatus();
+    setInterval(updateLiveStatus, 120000);
+</script>
 
         <!-- Featured ministries -->
         <section id="featured-ministries" class="section dark">
