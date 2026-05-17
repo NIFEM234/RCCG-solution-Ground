@@ -236,9 +236,10 @@
    href="https://www.youtube.com/@RCCGSolutionGroundKent/live" 
    target="_blank" 
    rel="noopener noreferrer">
-    <img id="streamImage" 
-         src="img/nextlive.jpg" 
-         alt="Watch our live stream">
+    <img id="streamImage"
+         src="img/nextlive.jpg"
+         alt="Watch our live stream"
+         loading="lazy" decoding="async">
     <span class="play-icon-overlay">
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M5 3L19 12L5 21V3Z" fill="white" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
@@ -562,43 +563,7 @@ let currentLiveVideoId = null;  // Will store the actual live video ID when you 
     </footer>
 
     <script src="js/main.js"></script>
-    <script>
-    (function(){
-        // Play a short, unobtrusive click using WebAudio.
-        // If the browser blocks autoplay, fall back to the first user gesture.
-        function playClick() {
-            try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (!AudioContext) return;
-                const ctx = new AudioContext();
-                const now = ctx.currentTime;
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'square';
-                osc.frequency.value = 1200 + Math.random() * 800;
-                gain.gain.setValueAtTime(0.0001, now);
-                gain.gain.linearRampToValueAtTime(0.6, now + 0.001);
-                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.02);
-                osc.connect(gain).connect(ctx.destination);
-                osc.start(now);
-                osc.stop(now + 0.03);
-                // close the context shortly after to free resources
-                setTimeout(function(){ try { ctx.close(); } catch(e){} }, 200);
-            } catch (e) { /* ignore errors (autoplay restrictions, etc.) */ }
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            var played = false;
-            try { playClick(); played = true; } catch (e) { /* noop */ }
-            if (!played) {
-                // Fallback: play on first user interaction (pointer or key) then detach.
-                var once = function () { try { playClick(); } catch(e){}; document.removeEventListener('pointerdown', once); document.removeEventListener('keydown', once); };
-                document.addEventListener('pointerdown', once, { passive: true });
-                document.addEventListener('keydown', once, { passive: true });
-            }
-        });
-    })();
-    </script>
+    <!-- Sound removed -->
     <!-- Back to top button -->
     <button id="back-to-top" class="back-to-top" aria-label="Back to top" title="Back to top">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
@@ -689,6 +654,7 @@ let currentLiveVideoId = null;  // Will store the actual live video ID when you 
             <button type="submit" class="chat-send">Send</button>
         </form>
     </aside>
+
 </body>
 
 </html>

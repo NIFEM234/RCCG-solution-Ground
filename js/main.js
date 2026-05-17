@@ -3,6 +3,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // remove the temporary class that disables transitions so animations
     // resume after the initial paint and we avoid the page fade-in effect
     try { document.documentElement.classList.remove('no-transitions'); } catch (e) {}
+
+    // Performance: ensure all images use lazy loading and async decoding
+    try {
+        document.querySelectorAll('img').forEach(function(img) {
+            if (!img.getAttribute('loading')) img.setAttribute('loading', 'lazy');
+            if (!img.getAttribute('decoding')) img.setAttribute('decoding', 'async');
+        });
+    } catch(e) {}
     const slides = document.querySelectorAll('.hero .slide');
     let idx = 0;
     function ensureBg(slide) {
@@ -1208,50 +1216,48 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Find Us button: open Google Maps directions from entered postcode to church address
     (function () {
-        const findBtn = document.getElementById('find-us-btn');
-        const postcodeInput = document.getElementById('postcode');
         const churchAddress = 'Palmer Avenue, Kingsfarm, Gravesend, Kent DA12 5DQ, United Kingdom';
+
+        // Support both index page (find-us-btn / postcode) and location page (church-find-btn / church-postcode)
+        var findBtn = document.getElementById('find-us-btn') || document.getElementById('church-find-btn');
+        var postcodeInput = document.getElementById('postcode') || document.getElementById('church-postcode');
         if (!findBtn || !postcodeInput) return;
 
         findBtn.addEventListener('click', function () {
-            const origin = postcodeInput.value.trim();
-            // If no postcode provided, open the church location in maps
-            let url;
+            var origin = postcodeInput.value.trim();
+            var url;
             if (!origin) {
                 url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(churchAddress);
             } else {
-                // Use Google Maps Directions with origin (user postcode) and destination church address
                 url = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(origin) + '&destination=' + encodeURIComponent(churchAddress) + '&travelmode=driving';
             }
             window.open(url, '_blank');
         });
     })();
 
-    // Find Evangelism Location: update embedded map to show directions from postcode to evangelism address
+    // Find Evangelism Location: open Google Maps directions from postcode to evangelism address
     (function () {
-        const evBtn = document.getElementById('ev-find-btn');
-        const evInput = document.getElementById('ev-postcode');
-        const evMapIframe = document.querySelector('#evangelism-location .map-card iframe');
-        const evDestination = "McDonald's, 85/87 New Rd, Gravesend DA11 0AF, United Kingdom";
-        if (!evBtn || !evInput || !evMapIframe) return;
+        var evDestination = "McDonald's, 85/87 New Rd, Gravesend DA11 0AF, United Kingdom";
 
-        evBtn.addEventListener('click', function () {
-            const origin = evInput.value.trim();
-            let src;
-            if (!origin) {
-                // show destination location centered
-                src = 'https://www.google.com/maps?q=' + encodeURIComponent("DA11 0AF Gravesend") + '&z=17&output=embed';
-            } else {
-                // attempt to load directions into the iframe using the directions URL (works in many browsers)
-                src = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(origin) + '&destination=' + encodeURIComponent(evDestination) + '&travelmode=walking&output=embed';
-            }
+        // Bind all evangelism find buttons (evangelism.html and location.html)
+        var buttons = [
+            { btn: document.getElementById('ev-find-btn'), input: document.getElementById('ev-postcode'), iframe: document.querySelector('#evangelism-location .map-card iframe') },
+            { btn: document.getElementById('ev-find-btn-loc'), input: document.getElementById('ev-postcode-loc'), iframe: document.querySelectorAll('#evangelism-location .map-card iframe')[0] }
+        ];
 
-            // update the iframe src so the embedded map shows the route
-            evMapIframe.src = src;
+        buttons.forEach(function(item) {
+            if (!item.btn || !item.input) return;
 
-            // also open a full maps directions page in a new tab for clearer step-by-step directions
-            const openUrl = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(origin || '') + '&destination=' + encodeURIComponent(evDestination) + '&travelmode=walking';
-            window.open(openUrl, '_blank');
+            item.btn.addEventListener('click', function () {
+                var origin = item.input.value.trim();
+                var url;
+                if (!origin) {
+                    url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(evDestination);
+                } else {
+                    url = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(origin) + '&destination=' + encodeURIComponent(evDestination) + '&travelmode=walking';
+                }
+                window.open(url, '_blank');
+            });
         });
     })();
 
@@ -1293,7 +1299,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     })();
 
-    // Minimal site-only chatbot (bottom-left)
+    // Smart site-only chatbot (bottom-left) — per-session memory, comprehensive church knowledge
     (function () {
         const toggle = document.getElementById('chat-toggle');
         const windowEl = document.getElementById('chat-window');
@@ -1303,107 +1309,300 @@ document.addEventListener('DOMContentLoaded', function () {
         const messages = document.getElementById('chat-messages');
         if (!toggle || !windowEl || !form || !input || !messages) return;
 
-        // ---- Simple persistent memory (localStorage) ----
-        const MEM_KEY = 'sg_assistant_memory_v1';
+        // ---- Per-session memory using sessionStorage (unique to each visitor's tab) ----
+        var SESSION_KEY = 'sg_chat_session_' + (Date.now() + Math.random()).toString(36);
+        // Try to reuse an existing session key if already stored
+        try {
+            var existingKey = sessionStorage.getItem('sg_chat_current_session');
+            if (existingKey) SESSION_KEY = existingKey;
+            else sessionStorage.setItem('sg_chat_current_session', SESSION_KEY);
+        } catch(e) {}
+
         function loadMemory() {
-            try { return JSON.parse(localStorage.getItem(MEM_KEY)) || { recent: [] }; } catch (e) { return { recent: [] }; }
+            try { return JSON.parse(sessionStorage.getItem(SESSION_KEY)) || { recent: [], name: '' }; } catch (e) { return { recent: [], name: '' }; }
         }
-        function saveMemory(mem) { try { localStorage.setItem(MEM_KEY, JSON.stringify(mem)); } catch (e) { /* ignore */ } }
-        const memory = loadMemory();
+        function saveMemory(mem) { try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(mem)); } catch (e) {} }
+        var memory = loadMemory();
 
         function rememberUserQuery(q) {
             if (!q) return;
             memory.recent = memory.recent || [];
             if (memory.recent[0] !== q) memory.recent.unshift(q);
-            if (memory.recent.length > 12) memory.recent.length = 12;
+            if (memory.recent.length > 20) memory.recent.length = 20;
+            // Try to learn the user's name from their messages
+            var nameMatch = q.match(/(?:my name is|i'm|i am|call me)\s+([A-Z][a-z]+)/i);
+            if (nameMatch) memory.name = nameMatch[1];
             saveMemory(memory);
         }
 
-        // ---- Build a lightweight knowledge index from page content ----
-        let knowledgeIndex = [];
-        function buildKnowledgeIndex() {
-            const items = [];
-            document.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li').forEach(el => {
-                const txt = (el.textContent || '').trim();
-                if (txt.length > 30) { items.push({ text: txt, tag: el.tagName.toLowerCase() }); }
-            });
-            document.querySelectorAll('.card, .min-card, .video-info, .feature-content').forEach(el => {
-                const txt = (el.innerText || el.textContent || '').trim(); if (txt && txt.length > 30) items.push({ text: txt, tag: 'card' });
-            });
-            document.querySelectorAll('.site-footer p, .site-footer h4').forEach(el => { const txt = (el.textContent || '').trim(); if (txt && txt.length > 10) items.push({ text: txt, tag: 'footer' }); });
-            return items;
-        }
-        function refreshKnowledge() { knowledgeIndex = buildKnowledgeIndex(); }
-        refreshKnowledge();
-
-        function findMatches(query, limit = 3) {
-            if (!query) return [];
-            const q = query.toLowerCase().split(/\s+/).filter(Boolean);
-            const scored = knowledgeIndex.map(item => {
-                const text = item.text.toLowerCase(); let score = 0; q.forEach(w => { if (text.includes(w)) score += 1; }); if (q.length && text.includes(query.toLowerCase())) score += 2; return { item, score };
-            }).filter(s => s.score > 0).sort((a,b) => b.score - a.score);
-            return scored.slice(0, limit).map(s => s.item.text);
-        }
+        // ---- Comprehensive church knowledge base ----
+        var churchKB = {
+            name: 'RCCG Solution Ground',
+            fullName: 'Redeemed Christian Church of God, Solution Ground',
+            denomination: 'RCCG (Redeemed Christian Church of God)',
+            address: 'Palmer Avenue, Kingsfarm, Gravesend, Kent DA12 5DQ, United Kingdom',
+            phone: '07491 644150',
+            email: 'solutiongroundkent@gmail.com',
+            charity: 'Registered charity in England (1207345)',
+            youtube: 'https://www.youtube.com/@RCCGSolutionGroundKent',
+            facebook: 'https://www.facebook.com/rccgsolutiongroundkent/',
+            instagram: 'https://www.instagram.com/rccg_solutionground/',
+            services: {
+                sunday: { time: '8:30 AM to 10:30 AM', desc: 'Sunday Worship Service including praise, worship, and the Word' },
+                mondayFasting: { time: 'Monday', desc: 'Fasting and Prayer' },
+                tuesdayPrayer: { time: 'Tuesday', desc: 'Prayer Meeting' },
+                wednesdayBible: { time: 'Wednesday', desc: 'Bible Study' },
+                saturdayEvangelism: { time: 'Saturday 11:00 AM – 12:00 PM', desc: 'Evangelism Outreach at McDonald\'s, 85/87 New Rd, Gravesend DA11 0AF' }
+            },
+            ministries: [
+                { name: 'Children', desc: 'Ministry for children aged 0-13, including babies, toddlers, and teens', href: 'children.html' },
+                { name: 'Youth', desc: 'Ministry for young people with activities, fellowship, and spiritual growth', href: 'youth.html' },
+                { name: 'Groups', desc: 'Small groups including Choir, Ushering, Media, and more', href: 'groups.html' },
+                { name: 'Evangelism', desc: 'Saturday outreach sharing faith in the local community', href: 'evangelism.html' }
+            ],
+            groups: ['Choir', 'Ushering Team', 'Media Group', 'Prayer Warriors'],
+            evangelismLocation: "McDonald's, 85/87 New Rd, Gravesend DA11 0AF",
+            generalOverseer: 'Pastor E.A. Adeboye',
+            pages: {
+                home: { href: 'index.html', desc: 'Home page' },
+                whoAreWe: { href: 'who-are-we.html', desc: 'Learn about our church and mission' },
+                newHere: { href: 'new-here.html', desc: 'Information for first-time visitors' },
+                overseers: { href: 'overseers.html', desc: 'Our church leadership and overseers' },
+                ministries: { href: 'ministries.html', desc: 'All ministries overview' },
+                children: { href: 'children.html', desc: 'Children\'s ministry' },
+                youth: { href: 'youth.html', desc: 'Youth ministry' },
+                groups: { href: 'groups.html', desc: 'Church groups: Choir, Ushers, Media' },
+                evangelism: { href: 'evangelism.html', desc: 'Evangelism team and outreach' },
+                watch: { href: 'watch.html', desc: 'Watch sermons and live streams' },
+                location: { href: 'location.html', desc: 'Find our church on the map' },
+                contact: { href: 'contact.html', desc: 'Get in touch with us' },
+                give: { href: 'give.html', desc: 'Give and support the church' }
+            }
+        };
 
         function escapeHtml(str) { return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
 
-        function appendMessage(payload, who = 'bot') {
-            let text = '';
-            let quick = null;
+        function appendMessage(payload, who) {
+            who = who || 'bot';
+            var text = '';
+            var quick = null;
             if (typeof payload === 'string') text = payload; else if (payload && typeof payload === 'object') { text = payload.text || ''; quick = payload.quickReplies || null; }
 
             if (who === 'user') {
-                const el = document.createElement('div'); el.className = 'chat-msg user'; el.textContent = text; messages.appendChild(el); messages.scrollTop = messages.scrollHeight; return;
+                var el = document.createElement('div'); el.className = 'chat-msg user'; el.textContent = text; messages.appendChild(el); messages.scrollTop = messages.scrollHeight; return;
             }
 
-            const typingEl = document.createElement('div'); typingEl.className = 'chat-msg bot'; typingEl.innerHTML = '<div class="chat-text"><span class="chat-typing"><span class="typing-dots"><span></span><span></span><span></span></span></span></div>';
+            var typingEl = document.createElement('div'); typingEl.className = 'chat-msg bot'; typingEl.innerHTML = '<div class="chat-text"><span class="chat-typing"><span class="typing-dots"><span></span><span></span><span></span></span></span></div>';
             messages.appendChild(typingEl); messages.scrollTop = messages.scrollHeight;
 
-            const len = (text || '').replace(/<[^>]*>/g, '').length; const delay = Math.min(1100 + len * 20, 3200);
-            setTimeout(() => {
-                const el = document.createElement('div'); el.className = 'chat-msg bot'; el.innerHTML = '<div class="chat-text">' + (text || '') + '</div>';
+            var len = (text || '').replace(/<[^>]*>/g, '').length;
+            var delay = Math.min(800 + len * 12, 2500);
+            setTimeout(function() {
+                var el = document.createElement('div'); el.className = 'chat-msg bot'; el.innerHTML = '<div class="chat-text">' + (text || '') + '</div>';
                 if (quick && Array.isArray(quick) && quick.length) {
-                    const container = document.createElement('div'); container.className = 'chat-quick-replies'; quick.forEach(q => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chat-quick-reply'; b.textContent = q.label; b.dataset.href = q.href || q.target || ''; container.appendChild(b); }); el.appendChild(container);
+                    var container = document.createElement('div'); container.className = 'chat-quick-replies';
+                    quick.forEach(function(q) { var b = document.createElement('button'); b.type = 'button'; b.className = 'chat-quick-reply'; b.textContent = q.label; b.dataset.href = q.href || q.target || ''; container.appendChild(b); });
+                    el.appendChild(container);
                 }
                 messages.replaceChild(el, typingEl); messages.scrollTop = messages.scrollHeight;
             }, delay);
         }
 
-        function findTextSnippet(keyword) { const matches = findMatches(keyword, 1); return (matches && matches.length) ? matches[0] : null; }
-
         function siteReply(userText) {
-            const t = (userText || '').trim(); if (!t) return { text: "Can you type your question?" };
+            var t = (userText || '').trim(); if (!t) return { text: "Please type your question and I'll do my best to help!" };
             rememberUserQuery(t);
-            const low = t.toLowerCase();
-            if (low.match(/^\s*(hi|hello|hey|good morning|good afternoon|good evening)\b/)) {
-                const last = (memory.recent && memory.recent[1]) ? `Last time you asked about: "${memory.recent[1]}".` : '';
-                return { text: `Hi — I\'m the SG Assistant. ${last} I can help with location, service times, ministries, giving, or opening pages. What would you like to do now?`, quickReplies: [{ label: 'Find us (map)', href: '#find-us' },{ label: 'Service times', href: 'new-here.html#what-to-expect' },{ label: 'Watch messages', href: 'https://www.youtube.com/@RCCGSolutionGroundKent' },{ label: 'Contact us', href: 'contact.html' }] };
+            var low = t.toLowerCase();
+            var greeting = memory.name ? ('Hi ' + memory.name + '! ') : '';
+
+            // Greetings
+            if (low.match(/^\s*(hi|hello|hey|good\s*morning|good\s*afternoon|good\s*evening|howdy|greetings|sup|what'?s?\s*up)\b/)) {
+                return { text: greeting + 'Welcome to RCCG Solution Ground! I can help you with service times, our location, ministries, how to give, watching sermons online, or finding contact information. What would you like to know?',
+                    quickReplies: [{ label: 'Service times', href: 'new-here.html#what-to-expect' }, { label: 'Find us (map)', href: 'location.html' }, { label: 'Watch online', href: 'https://www.youtube.com/@RCCGSolutionGroundKent' }, { label: 'Contact us', href: 'contact.html' }] };
             }
 
-            if (low.match(/location|address|where|palmer|palmer avenue/)) {
-                const el = document.getElementById('find-us'); if (el) { const addr = el.querySelector('.min-card p')?.innerText.trim() || el.innerText.trim(); return { text: `Our address is: ${addr}. Tap 'Open map' to view directions.`, quickReplies: [{ label: 'Open map', href: '#find-us' }] }; }
+            // Thank you
+            if (low.match(/\b(thank|thanks|cheers|appreciate)\b/)) {
+                return { text: "You're welcome! Is there anything else I can help you with?" };
             }
 
-            if (low.match(/service|sunday|time|times|services/)) { const matches = findMatches('sunday', 2); if (matches && matches.length) return { text: `Service times — ${matches.join(' \n\n')}`, quickReplies: [{ label: 'More about Sundays', href: 'new-here.html#what-to-expect' }] }; }
-
-            if (low.match(/ministri|children|youth|groups|evangelism/)) {
-                const cardEls = document.querySelectorAll('#featured-ministries .card');
-                if (cardEls && cardEls.length) {
-                    const items = Array.from(cardEls).map(card => { const titleEl = card.querySelector('.card-body h3'); const descEl = card.querySelector('.card-body p'); return { title: titleEl ? titleEl.textContent.trim() : 'Ministry', desc: descEl ? descEl.textContent.trim() : '', href: card.getAttribute('href') || 'children.html' }; });
-                    const htmlLines = items.map(i => `<div style="margin-bottom:8px;"><a href="${escapeHtml(i.href)}" style="color:#9fd6ff;text-decoration:underline;">${escapeHtml(i.title)}</a> — ${escapeHtml(i.desc)}</div>`).join('');
-                    return { text: `Here are the main groups and ministries:\n\n${htmlLines}`, quickReplies: items.slice(0,4).map(i => ({ label: i.title, href: i.href })) };
-                }
+            // Name introduction
+            if (low.match(/\b(my name is|i'm |i am |call me )/i)) {
+                return { text: 'Nice to meet you' + (memory.name ? ', ' + memory.name : '') + '! How can I help you today?',
+                    quickReplies: [{ label: 'Service times', href: 'new-here.html#what-to-expect' }, { label: 'Location', href: 'location.html' }] };
             }
 
-            if (low.match(/watch|online|youtube|live/)) { const el = document.querySelector('.video-thumb a') || document.querySelector('#latest-message a'); if (el) return { text: 'I can open recent messages or live streams for you. Tap below to view.', quickReplies: [{ label: 'Watch messages', href: el.href || el.getAttribute('href') }] }; }
+            // Location / Address / Directions
+            if (low.match(/\b(location|address|where|direction|map|find you|find us|how to get|how do i get|come|visit|palmer|kingsfarm|gravesend|postcode|da12)\b/)) {
+                return { text: 'Our church is located at <strong>Palmer Avenue, Kingsfarm, Gravesend, Kent DA12 5DQ</strong>. You can view directions on our Location page or enter your postcode to get turn-by-turn directions.',
+                    quickReplies: [{ label: 'Open map', href: 'location.html' }, { label: 'Contact us', href: 'contact.html' }] };
+            }
 
-            if (low.match(/contact|call|phone|email/)) { return { text: 'You can reach us via the Contact page or phone: 07491 644150. Would you like me to open the contact page?', quickReplies: [{ label: 'Open contact page', href: 'contact.html' }] }; }
+            // Evangelism location
+            if (low.match(/\b(evangeli|outreach|saturday meeting|mcdon|new rd|da11)\b/)) {
+                return { text: 'Our evangelism outreach happens every <strong>Saturday from 11:00 AM to 12:00 PM</strong>. We meet near McDonald\'s, 85/87 New Rd, Gravesend DA11 0AF. Everyone is welcome to join!',
+                    quickReplies: [{ label: 'Evangelism page', href: 'evangelism.html' }, { label: 'View on map', href: 'location.html' }] };
+            }
 
-            const words = t.split(/\s+/).slice(0, 6).map(w => w.replace(/[^a-z0-9]/gi, '')).filter(Boolean);
-            const query = words.join(' ');
-            if (query) { const matches = findMatches(query, 4); if (matches && matches.length) { const combined = matches.join('\n\n'); return { text: `I found this on the site that may help:\n\n${combined}` }; } }
+            // Service times (comprehensive)
+            if (low.match(/\b(service|sunday|time|times|when|schedule|worship|what time|hour)\b/)) {
+                return { text: 'Here are our regular services:<br><br>' +
+                    '<strong>Sunday Worship:</strong> 8:30 AM – 10:30 AM<br>' +
+                    '<strong>Monday:</strong> Fasting & Prayer<br>' +
+                    '<strong>Tuesday:</strong> Prayer Meeting<br>' +
+                    '<strong>Wednesday:</strong> Bible Study<br>' +
+                    '<strong>Saturday:</strong> Evangelism Outreach (11:00 AM – 12:00 PM)',
+                    quickReplies: [{ label: 'New here?', href: 'new-here.html' }, { label: 'Watch online', href: 'https://www.youtube.com/@RCCGSolutionGroundKent' }] };
+            }
 
-            return { text: "Sorry — I can only provide information derived from this website. Try: 'Where are you?', 'Service times', 'Watch messages', or 'Contact'." };
+            // Ministries
+            if (low.match(/\b(ministr|department|team|serve|serving|volunteer)\b/)) {
+                var ministryHtml = churchKB.ministries.map(function(m) {
+                    return '<div style="margin-bottom:6px;"><a href="' + escapeHtml(m.href) + '" style="color:#9fd6ff;text-decoration:underline;">' + escapeHtml(m.name) + '</a> — ' + escapeHtml(m.desc) + '</div>';
+                }).join('');
+                return { text: 'We have several ministries you can get involved in:<br><br>' + ministryHtml,
+                    quickReplies: churchKB.ministries.map(function(m) { return { label: m.name, href: m.href }; }) };
+            }
+
+            // Children
+            if (low.match(/\b(child|children|kids|baby|babies|toddler|junior|infant)\b/)) {
+                return { text: 'Our Children\'s Ministry caters for ages 0-13, including babies, toddlers, and young teens. Children enjoy age-appropriate teaching, activities, and fellowship during Sunday services.',
+                    quickReplies: [{ label: 'Children\'s page', href: 'children.html' }, { label: 'Contact us', href: 'contact.html' }] };
+            }
+
+            // Youth
+            if (low.match(/\b(youth|young|teen|teenager|young people|young adult)\b/)) {
+                return { text: 'Our Youth Ministry is for young people looking for fellowship, spiritual growth, and fun activities. We have regular meetups and events throughout the year.',
+                    quickReplies: [{ label: 'Youth page', href: 'youth.html' }] };
+            }
+
+            // Groups (Choir, Ushers, Media)
+            if (low.match(/\b(group|choir|sing|usher|media|camera|sound|audio|visual|livestream)\b/)) {
+                return { text: 'We have several groups you can join:<br><br>' +
+                    '<strong>Choir:</strong> Praise and worship team<br>' +
+                    '<strong>Ushering Team:</strong> Welcoming and assisting during services<br>' +
+                    '<strong>Media Group:</strong> Sound, camera, livestream, graphics, and video editing<br><br>' +
+                    'No previous experience required — volunteers are trained!',
+                    quickReplies: [{ label: 'Groups page', href: 'groups.html' }] };
+            }
+
+            // Watch / YouTube / Live / Sermons
+            if (low.match(/\b(watch|sermon|live|stream|video|youtube|online|broadcast|message)\b/)) {
+                return { text: 'You can watch our sermons and live streams on YouTube! We stream our Sunday services live and have past sermons available to watch anytime.',
+                    quickReplies: [{ label: 'Watch on YouTube', href: 'https://www.youtube.com/@RCCGSolutionGroundKent' }, { label: 'Watch page', href: 'watch.html' }] };
+            }
+
+            // Give / Donate / Tithe / Offering
+            if (low.match(/\b(give|giving|donat|tithe|offering|support|contribute|payment)\b/)) {
+                return { text: 'Thank you for your generosity! You can give tithes, offerings, and donations through our Give page. Your support helps us continue our mission and serve the community.',
+                    quickReplies: [{ label: 'Give now', href: 'give.html' }] };
+            }
+
+            // Contact / Phone / Email
+            if (low.match(/\b(contact|call|phone|email|reach|get in touch|speak|talk to)\b/)) {
+                return { text: 'You can reach us by:<br><br>' +
+                    '<strong>Phone:</strong> <a href="tel:+447491644150" style="color:#9fd6ff;">07491 644150</a><br>' +
+                    '<strong>Email:</strong> solutiongroundkent@gmail.com<br><br>' +
+                    'Or fill out the form on our Contact page.',
+                    quickReplies: [{ label: 'Contact page', href: 'contact.html' }] };
+            }
+
+            // New here / First time / Visitor
+            if (low.match(/\b(new here|first time|visitor|visit|never been|what to expect|what happens)\b/)) {
+                return { text: 'Welcome! If you\'re visiting for the first time, our Sunday service runs from 8:30 AM to 10:30 AM. You\'ll experience warm fellowship, praise and worship, and an inspiring message. Come as you are — we\'d love to meet you!',
+                    quickReplies: [{ label: 'New here page', href: 'new-here.html' }, { label: 'Find us', href: 'location.html' }] };
+            }
+
+            // Who are we / About
+            if (low.match(/\b(who are|about|mission|vision|believe|faith|history|story)\b/)) {
+                return { text: 'RCCG Solution Ground is a warm, family-oriented church in Gravesend, Kent. We are part of the Redeemed Christian Church of God (RCCG) worldwide. Our mission is to love people, share the gospel, and make a difference in our community.',
+                    quickReplies: [{ label: 'Who are we?', href: 'who-are-we.html' }, { label: 'Overseers', href: 'overseers.html' }] };
+            }
+
+            // Pastor / Leadership / Overseer
+            if (low.match(/\b(pastor|leader|overseer|adeboye|head|senior)\b/)) {
+                return { text: 'The General Overseer of RCCG worldwide is Pastor E.A. Adeboye. You can learn more about our local church leadership on the Overseers page.',
+                    quickReplies: [{ label: 'Overseers', href: 'overseers.html' }] };
+            }
+
+            // Prayer
+            if (low.match(/\b(pray|prayer|praying|fasting|fast)\b/)) {
+                return { text: 'We believe in the power of prayer! We have dedicated prayer meetings:<br><br>' +
+                    '<strong>Monday:</strong> Fasting & Prayer<br>' +
+                    '<strong>Tuesday:</strong> Prayer Meeting<br><br>' +
+                    'If you have a prayer request, please reach out to us via the Contact page.',
+                    quickReplies: [{ label: 'Contact for prayer', href: 'contact.html' }] };
+            }
+
+            // Bible study
+            if (low.match(/\b(bible|study|scripture|word of god|teaching)\b/)) {
+                return { text: 'Our Wednesday Bible Study is a great time to dive deeper into God\'s Word. Everyone is welcome, whether you\'re new to the Bible or have been studying for years.',
+                    quickReplies: [{ label: 'Service times', href: 'new-here.html#what-to-expect' }] };
+            }
+
+            // Social media
+            if (low.match(/\b(social|facebook|instagram|follow|media page)\b/)) {
+                return { text: 'Follow us on social media to stay connected!<br><br>' +
+                    '<a href="https://www.facebook.com/rccgsolutiongroundkent/" style="color:#9fd6ff;" target="_blank">Facebook</a><br>' +
+                    '<a href="https://www.instagram.com/rccg_solutionground/" style="color:#9fd6ff;" target="_blank">Instagram</a><br>' +
+                    '<a href="https://www.youtube.com/@RCCGSolutionGroundKent" style="color:#9fd6ff;" target="_blank">YouTube</a>' };
+            }
+
+            // RCCG / Redeemed
+            if (low.match(/\b(rccg|redeemed|christian church of god)\b/)) {
+                return { text: 'RCCG stands for the Redeemed Christian Church of God. It is a global church with parishes in over 190 countries. Our local parish, Solution Ground, is based in Gravesend, Kent.',
+                    quickReplies: [{ label: 'Who are we?', href: 'who-are-we.html' }] };
+            }
+
+            // Charity
+            if (low.match(/\b(charity|registered|number|1207345)\b/)) {
+                return { text: 'RCCG Solution Ground is a registered charity in England with charity number 1207345.' };
+            }
+
+            // Help / What can you do
+            if (low.match(/\b(help|what can you|what do you|assist|options|menu)\b/)) {
+                return { text: 'I can help you with:<br><br>' +
+                    '- Service times and schedules<br>' +
+                    '- Our church location and directions<br>' +
+                    '- Ministries (Children, Youth, Groups, Evangelism)<br>' +
+                    '- How to give or donate<br>' +
+                    '- Watching sermons online<br>' +
+                    '- Contact information<br>' +
+                    '- Information about RCCG and our church<br><br>' +
+                    'Just ask me anything!',
+                    quickReplies: [{ label: 'Service times', href: 'new-here.html#what-to-expect' }, { label: 'Location', href: 'location.html' }, { label: 'Contact', href: 'contact.html' }] };
+            }
+
+            // Parking / Transport
+            if (low.match(/\b(park|parking|bus|train|transport|drive|car)\b/)) {
+                return { text: 'Our church is at Palmer Avenue, Kingsfarm, Gravesend, Kent DA12 5DQ. You can find parking nearby. For public transport options, check our Location page or enter your postcode to get directions.',
+                    quickReplies: [{ label: 'Location & map', href: 'location.html' }] };
+            }
+
+            // Goodbye
+            if (low.match(/\b(bye|goodbye|see you|later|take care|gotta go)\b/)) {
+                return { text: (memory.name ? 'Goodbye ' + memory.name + '! ' : 'Goodbye! ') + 'God bless you. We hope to see you at Solution Ground soon!' };
+            }
+
+            // Fallback — try to find relevant content from page
+            var searchWords = t.split(/\s+/).slice(0, 8).map(function(w) { return w.replace(/[^a-z0-9]/gi, ''); }).filter(Boolean);
+            // Search page content for matches
+            var pageEls = document.querySelectorAll('h1,h2,h3,h4,p,li,.card-body,.feature-content');
+            var bestMatch = null; var bestScore = 0;
+            pageEls.forEach(function(el) {
+                var txt = (el.textContent || '').trim().toLowerCase();
+                if (txt.length < 20) return;
+                var score = 0;
+                searchWords.forEach(function(w) { if (w.length > 2 && txt.includes(w.toLowerCase())) score++; });
+                if (score > bestScore) { bestScore = score; bestMatch = (el.textContent || '').trim(); }
+            });
+
+            if (bestMatch && bestScore >= 2) {
+                var snippet = bestMatch.length > 200 ? bestMatch.substring(0, 200) + '...' : bestMatch;
+                return { text: 'I found something relevant on this page:<br><br>' + escapeHtml(snippet) };
+            }
+
+            return { text: "I'm not sure about that, but I can help with service times, our location, ministries, giving, watching online, or contact information. Try asking about any of these!",
+                quickReplies: [{ label: 'Service times', href: 'new-here.html#what-to-expect' }, { label: 'Location', href: 'location.html' }, { label: 'Contact', href: 'contact.html' }, { label: 'What can you help with?', href: '' }] };
         }
 
         function openChat() {
@@ -1411,11 +1610,10 @@ document.addEventListener('DOMContentLoaded', function () {
             windowEl.setAttribute('aria-hidden', 'false');
             windowEl.classList.add('opening');
             if (!messages.children.length) {
-                const last = memory.recent && memory.recent[0];
-                if (last) appendMessage({ text: `Welcome back — you last asked: "${escapeHtml(last)}". How can I help further?`, quickReplies: [{ label: 'Service times', href: 'new-here.html#what-to-expect' }, { label: 'Find us', href: '#find-us' }] });
-                else appendMessage('Hi — I can answer questions about this site. Try: location, services, ministries, contact.');
+                appendMessage({ text: 'Hi! I\'m the SG Assistant for RCCG Solution Ground. I can help you with service times, location, ministries, giving, watching sermons, and more. How can I help you today?',
+                    quickReplies: [{ label: 'Service times', href: 'new-here.html#what-to-expect' }, { label: 'Find us', href: 'location.html' }, { label: 'Watch online', href: 'https://www.youtube.com/@RCCGSolutionGroundKent' }, { label: 'Contact us', href: 'contact.html' }] });
             }
-            const onEnd = (e) => {
+            var onEnd = function(e) {
                 if (e.target !== windowEl) return;
                 windowEl.classList.remove('opening');
                 windowEl.removeEventListener('animationend', onEnd);
@@ -1427,7 +1625,7 @@ document.addEventListener('DOMContentLoaded', function () {
         function closeChat() {
             windowEl.classList.remove('opening');
             windowEl.classList.add('closing');
-            const onEnd = (e) => {
+            var onEnd = function(e) {
                 if (e.target !== windowEl) return;
                 windowEl.classList.remove('closing');
                 windowEl.setAttribute('aria-hidden', 'true');
@@ -1436,13 +1634,13 @@ document.addEventListener('DOMContentLoaded', function () {
             windowEl.addEventListener('animationend', onEnd);
         }
 
-        toggle.addEventListener('click', () => { const hidden = windowEl.getAttribute('aria-hidden') === 'true'; if (hidden) openChat(); else closeChat(); }); closeBtn.addEventListener('click', closeChat);
+        toggle.addEventListener('click', function() { var hidden = windowEl.getAttribute('aria-hidden') === 'true'; if (hidden) openChat(); else closeChat(); }); closeBtn.addEventListener('click', closeChat);
 
-        form.addEventListener('submit', (e) => { e.preventDefault(); const text = input.value.trim(); if (!text) return; appendMessage(text, 'user'); input.value = ''; setTimeout(() => { const reply = siteReply(text); appendMessage(reply, 'bot'); }, 450); });
+        form.addEventListener('submit', function(e) { e.preventDefault(); var text = input.value.trim(); if (!text) return; appendMessage(text, 'user'); input.value = ''; setTimeout(function() { var reply = siteReply(text); appendMessage(reply, 'bot'); }, 450); });
 
-        messages.addEventListener('click', (e) => { const btn = e.target.closest('.chat-quick-reply'); if (!btn) return; const href = btn.dataset.href; if (!href) return; if (href.startsWith('http')) { window.open(href, '_blank'); return; } if (href.indexOf('.html') !== -1) { window.location.href = href; return; } if (href.startsWith('#')) { const target = document.querySelector(href); if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); windowEl.setAttribute('aria-hidden', 'true'); } return; } window.open(href, '_blank'); });
+        messages.addEventListener('click', function(e) { var btn = e.target.closest('.chat-quick-reply'); if (!btn) return; var href = btn.dataset.href; if (!href) { input.value = btn.textContent; form.dispatchEvent(new Event('submit')); return; } if (href.startsWith('http')) { window.open(href, '_blank'); return; } if (href.indexOf('.html') !== -1) { window.location.href = href; return; } if (href.startsWith('#')) { var target = document.querySelector(href); if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); windowEl.setAttribute('aria-hidden', 'true'); } return; } window.open(href, '_blank'); });
 
-        const kdObserver = new MutationObserver(() => { refreshKnowledge(); }); kdObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+        // Knowledge is built into the chatbot directly — no observer needed
 
     })();
 

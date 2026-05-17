@@ -5153,21 +5153,29 @@ body.mobile-nav-open .has-dropdown .dropdown { display: none }
 }
 
 /* Find Us / Location: dark navy to match other sections */
-#find-us {
+#find-us,
+#church-location {
     background: linear-gradient(180deg, #071726 0%, #071a2a 60%, #071726 100%);
     background-color: #071726;
     color: #fff;
+    padding: 120px 0;
 }
 
 #find-us .location-card h3,
 #find-us .location-card h4,
 #find-us .location-card p,
-#find-us label {
+#find-us label,
+#church-location .location-card h3,
+#church-location .location-card h4,
+#church-location .location-card p,
+#church-location label {
     color: rgba(255,255,255,0.92);
 }
 
 #find-us .postcode-row input,
-#find-us #postcode {
+#find-us #postcode,
+#church-location .postcode-row input,
+#church-location #church-postcode {
     width: 100%;
     max-width: 680px;
     padding: 14px 18px;
@@ -5181,7 +5189,10 @@ body.mobile-nav-open .has-dropdown .dropdown { display: none }
 
 #find-us .get-in-touch,
 #find-us .btn.btn-dark,
-#find-us .btn-dark {
+#find-us .btn-dark,
+#church-location .get-in-touch,
+#church-location .btn.btn-dark,
+#church-location .btn-dark {
     background: #fff;
     color: #071726;
     border-radius: 999px;
@@ -5190,15 +5201,17 @@ body.mobile-nav-open .has-dropdown .dropdown { display: none }
     box-shadow: 0 12px 28px rgba(2,8,20,0.35);
 }
 
-#find-us .map-card iframe {
+#find-us .map-card iframe,
+#church-location .map-card iframe {
     border-radius: 12px;
     box-shadow: 0 18px 48px rgba(2,8,20,0.5);
     border: none;
 }
 
 @media (max-width: 900px) {
-    #find-us { padding: 48px 0 }
-    #find-us .postcode-row input { max-width: 100% }
+    #find-us, #church-location { padding: 48px 0 }
+    #find-us .postcode-row input,
+    #church-location .postcode-row input { max-width: 100% }
 }
 
 
